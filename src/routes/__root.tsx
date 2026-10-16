@@ -8,7 +8,8 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { FileText, Info, LayoutGrid, Menu, Ruler, Sparkles, X } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -114,15 +115,46 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 const nav = [
-  { to: "/catalogue", label: "Catalogue" },
-  { to: "/pose", label: "Pose" },
-  { to: "/a-propos", label: "À propos" },
-  { to: "/simulateur", label: "Simulateur IA" },
-  { to: "/contact", label: "Devis" },
+  { to: "/catalogue", label: "Catalogue", icon: LayoutGrid },
+  { to: "/pose", label: "Pose", icon: Ruler },
+  { to: "/a-propos", label: "À propos", icon: Info },
+  { to: "/simulateur", label: "Simulateur IA", icon: Sparkles },
+  { to: "/contact", label: "Devis", icon: FileText },
 ] as const;
+
+function MobileMenu({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <div className="grid grid-cols-2 gap-3 px-5 pb-5 pt-1 sm:hidden animate-in fade-in slide-in-from-top-2 duration-200">
+      {nav.map((n, i) => (
+        <Link
+          key={n.to}
+          to={n.to}
+          onClick={onNavigate}
+          className="group flex min-w-0 items-center gap-3 rounded-xl border bg-card px-4 py-4 shadow-soft transition-colors hover:bg-accent/40 active:bg-accent/60"
+          activeProps={{
+            className:
+              "border-primary/30 bg-primary text-primary-foreground hover:bg-primary/90",
+          }}
+          style={{ animationDelay: `${i * 40}ms` }}
+        >
+          <n.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <span className="truncate text-sm font-semibold">{n.label}</span>
+        </Link>
+      ))}
+    </div>
+  );
+}
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
+
+  // Ferme le menu mobile à chaque navigation.
+  useEffect(() => {
+    const unsub = router.subscribe("onResolved", () => setMenuOpen(false));
+    return unsub;
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -131,7 +163,7 @@ function RootComponent() {
           <Link to="/" className="font-display text-2xl">
             Composia
           </Link>
-          <nav className="flex gap-4 text-sm font-medium sm:gap-7">
+          <nav className="hidden gap-4 text-sm font-medium sm:flex sm:gap-7">
             {nav.map((n) => (
               <Link
                 key={n.to}
@@ -143,7 +175,17 @@ function RootComponent() {
               </Link>
             ))}
           </nav>
+          <button
+            type="button"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-card text-foreground transition-colors hover:bg-accent/50 sm:hidden"
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
+        {menuOpen && <MobileMenu onNavigate={() => setMenuOpen(false)} />}
       </header>
       <RevealObserver />
       <main>

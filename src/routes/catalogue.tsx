@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/lib/catalogue";
+import { PhotoGrid } from "@/components/Lightbox";
+import { Pictos } from "@/components/Pictos";
 
 export const Route = createFileRoute("/catalogue")({
   head: () => ({
@@ -45,6 +47,11 @@ function Catalogue() {
         ))}
       </nav>
 
+      <section className="mt-12 rounded-2xl bg-card p-6 shadow-soft md:p-10">
+        <p className="eyebrow">Caractéristiques du composite</p>
+        <Pictos compact className="mt-6" />
+      </section>
+
       <div className="mt-16 space-y-24">
         {CATEGORIES.map((cat) => (
           <section key={cat.id} id={cat.id} className="scroll-mt-24">
@@ -63,7 +70,20 @@ function Catalogue() {
 
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {cat.produits.map((p) => (
-                <article key={p.id} className="rounded-2xl bg-card p-6 shadow-soft">
+                <Link
+                  key={p.id}
+                  to="/catalogue/$produitId"
+                  params={{ produitId: p.id }}
+                  className="group flex flex-col rounded-2xl bg-card p-6 shadow-soft transition-shadow hover:shadow-lg"
+                >
+                  {p.visuel && (
+                    <img
+                      src={p.visuel}
+                      alt={`Profilé ${p.nom}`}
+                      loading="lazy"
+                      className="mb-4 aspect-[16/9] w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                    />
+                  )}
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">{p.finition}</p>
                   <h3 className="mt-1 text-xl">{p.nom}</h3>
                   <p className="mt-3 text-sm text-muted-foreground">{p.description}</p>
@@ -83,7 +103,8 @@ function Catalogue() {
                       </li>
                     ))}
                   </ul>
-                </article>
+                  <span className="mt-auto pt-4 text-sm font-semibold text-primary">Voir la fiche →</span>
+                </Link>
               ))}
             </div>
 
@@ -93,6 +114,9 @@ function Catalogue() {
                 <dl className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {cat.accessoires.map((a) => (
                     <div key={a.nom}>
+                      {a.image && (
+                        <img src={a.image} alt="" loading="lazy" className="mb-3 aspect-[4/3] w-full rounded-lg bg-background object-contain" />
+                      )}
                       <dt className="font-semibold">{a.nom}</dt>
                       <dd className="mt-1 text-sm text-muted-foreground">{a.description}</dd>
                     </div>
@@ -101,17 +125,26 @@ function Catalogue() {
               </div>
             )}
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-3">
-              {cat.galerie.slice(1).map((g) => (
-                <img
-                  key={g.src}
-                  src={g.src}
-                  alt={g.alt}
-                  loading="lazy"
-                  className="aspect-[4/3] w-full rounded-xl object-cover"
+            {cat.realisations && (
+              <div className="mt-10">
+                <h3 className="text-xl">Réalisations</h3>
+                <PhotoGrid
+                  photos={cat.realisations}
+                  alt={`Réalisation ${cat.titre}`}
+                  className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4"
                 />
-              ))}
-            </div>
+              </div>
+            )}
+            {cat.montage && (
+              <div className="mt-10">
+                <h3 className="text-xl">Montage &amp; ossature</h3>
+                <PhotoGrid
+                  photos={cat.montage}
+                  alt={`Montage ${cat.titre}`}
+                  className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4"
+                />
+              </div>
+            )}
           </section>
         ))}
       </div>

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PhotoGrid } from "@/components/Lightbox";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/lib/catalogue";
 
@@ -68,9 +69,15 @@ function Pose() {
         {accessoires.map((cat) => (
           <section key={cat.id}>
             <h2 className="text-2xl">{cat.titre}</h2>
+            {cat.montage && (
+              <PhotoGrid photos={cat.montage} alt={`Montage ${cat.titre}`} className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4" />
+            )}
             <dl className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {cat.accessoires!.map((a) => (
                 <div key={a.nom} className="rounded-xl bg-card p-5 shadow-soft">
+                  {a.image && (
+                    <img src={a.image} alt="" loading="lazy" className="mb-3 aspect-[4/3] w-full rounded-lg object-contain" />
+                  )}
                   <dt className="font-semibold">{a.nom}</dt>
                   <dd className="mt-1 text-sm text-muted-foreground">{a.description}</dd>
                 </div>

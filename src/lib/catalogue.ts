@@ -35,6 +35,12 @@ export const TEINTES_BOIS = TEINTES.filter((t) => t.id !== "gris-clair");
 
 export type Produit = {
   id: string;
+  /** Vue produit (profilé) extraite du catalogue. */
+  visuel?: string;
+  /** Photos de mise en situation réelle. */
+  situation?: string[];
+  /** Nuancier des films PVC extérieurs, pour les finitions filmées. */
+  folio?: string;
   nom: string;
   finition: string;
   description: string;
@@ -49,7 +55,11 @@ export type Categorie = {
   image: string;
   galerie: { src: string; alt: string }[];
   produits: Produit[];
-  accessoires?: { nom: string; description: string }[];
+  accessoires?: { nom: string; description: string; image?: string }[];
+  /** Photos de réalisations de la gamme. */
+  realisations?: string[];
+  /** Photos de pose et schémas de montage. */
+  montage?: string[];
 };
 
 const usageSol =
@@ -61,7 +71,7 @@ const usageCloture =
 const usagePergola =
   "Nos profilés de pergola composent des espaces de vie extérieurs esthétiques et résistants.";
 
-export const CATEGORIES: Categorie[] = [
+const CATEGORIES_BASE: Categorie[] = [
   {
     id: "sols",
     titre: "Sols & terrasses",
@@ -136,7 +146,31 @@ export const CATEGORIES: Categorie[] = [
         teintes: TEINTES,
       },
       {
+        id: "deck-145-22-bois",
+        nom: "ARE-DECK 145/22",
+        finition: "Alvéolaire, bois embossé",
+        description: usageSol,
+        specs: [
+          { label: "Largeur", value: "145 mm" },
+          { label: "Épaisseur", value: "22 mm" },
+          { label: "Surface", value: "Bois embossé" },
+        ],
+        teintes: TEINTES,
+      },
+      {
         id: "deck-145-22-plein",
+        nom: "ARE-DECK 145/22 PLEIN",
+        finition: "Profilé plein (Solid deck)",
+        description: usageSol,
+        specs: [
+          { label: "Largeur", value: "145 mm" },
+          { label: "Épaisseur", value: "22 mm" },
+          { label: "Structure", value: "Pleine" },
+        ],
+        teintes: TEINTES,
+      },
+      {
+        id: "deck-145-22-plein-bois",
         nom: "ARE-DECK 145/22 PLEIN",
         finition: "Profilé plein, bois embossé",
         description: usageSol,
@@ -144,6 +178,7 @@ export const CATEGORIES: Categorie[] = [
           { label: "Largeur", value: "145 mm" },
           { label: "Épaisseur", value: "22 mm" },
           { label: "Structure", value: "Pleine" },
+          { label: "Surface", value: "Bois embossé" },
         ],
         teintes: TEINTES,
       },
@@ -385,6 +420,97 @@ export const CATEGORIES: Categorie[] = [
   },
 ];
 
+const IMAGES = import.meta.glob<{ url: string }>("../assets/cat/*.asset.json", {
+  eager: true,
+  import: "default",
+});
+
+/** URL d'un visuel extrait du catalogue (src/assets/cat/<nom>.jpg). */
+export function img(nom: string): string {
+  const key = Object.keys(IMAGES).find((k) => /\/(.+)\.(jpg|png)\.asset\.json$/.exec(k)?.[1] === nom);
+  if (!key) throw new Error(`Visuel catalogue manquant : ${nom}`);
+  return IMAGES[key].url;
+}
+
+const range = (prefix: string, n: number, from = 1) =>
+  Array.from({ length: n }, (_, i) => `${prefix}-${i + from}`);
+
+const MEDIA_PRODUITS: Record<string, { visuel: string; situation: string[]; folio?: string }> = {
+  "deck-150-25": { visuel: "p-deck-150-25", situation: ["s-deck-150-25"] },
+  "deck-145-22": { visuel: "p-deck-145-22", situation: ["s-deck-145-22"] },
+  "deck-145-28": { visuel: "p-deck-145-28", situation: ["s-deck-145-28"] },
+  "deck-150-26": { visuel: "p-deck-150-26", situation: ["s-deck-150-26"] },
+  "deck-150-26-large": { visuel: "p-deck-150-26-large", situation: ["s-deck-150-26-large"] },
+  "deck-145-22-bois": { visuel: "p-deck-145-22-bois", situation: ["s-deck-145-22-bois"] },
+  "deck-145-22-plein": { visuel: "p-deck-145-22-plein", situation: ["s-deck-145-22-plein"] },
+  "deck-145-22-plein-bois": {
+    visuel: "p-deck-145-22-plein-bois",
+    situation: ["s-deck-145-22-plein-bois"],
+  },
+  "decklam-145-28": { visuel: "p-decklam", situation: ["s-decklam"], folio: "f-decklam" },
+  "panneau-220-26-lisse": { visuel: "p-panneau-lisse", situation: ["s-panneau-lisse", "a-fac-1"] },
+  "panneau-220-26-bois": { visuel: "p-panneau-bois", situation: ["s-panneau-bois", "a-fac-2"] },
+  "clin-186-21-bois": {
+    visuel: "p-clin-bois",
+    situation: ["s-clin-bois", "a-fac-8", "a-fac-9", "a-fac-10"],
+  },
+  "clin-186-21-folio": { visuel: "p-clin-folio", situation: ["s-clin-folio"], folio: "f-clin" },
+  "brise-soleil-105-52": {
+    visuel: "p-brise",
+    situation: ["s-brise", "a-bs-1", "a-bs-2", "a-bs-3"],
+    folio: "f-brise",
+  },
+  "cloture-200-22-bois": { visuel: "p-cloture-bois", situation: ["s-cloture-1"] },
+  "cloture-200-22-lisse": { visuel: "p-cloture-lisse", situation: ["s-cloture-2"] },
+  "cloture-105-52": { visuel: "p-cloture-105", situation: ["s-cloture-3"] },
+  "poteau-80-80": { visuel: "p-poteau", situation: ["s-cloture-4"] },
+  "pergola-poteau": { visuel: "p-pergola-poteau", situation: ["s-pergola-1"] },
+  "pergola-poutre": { visuel: "p-pergola-poutre", situation: ["s-pergola-2", "s-pergola-3"] },
+};
+
+const MEDIA_CATEGORIES: Record<string, { realisations: string[]; montage?: string[]; accessoires?: string[] }> = {
+  sols: {
+    realisations: range("a-sol", 8),
+    montage: range("m", 7),
+    accessoires: ["x-joist", "x-edge", "x-clip", "x-pedestal", "x-alu", "x-glue", "x-vis-comp", "x-vis-metal", "x-vis-beton"],
+  },
+  facades: { realisations: [...range("a-fac", 7), ...range("a-bs", 3)] },
+  clotures: { realisations: range("s-cloture", 4), montage: ["sch-cloture"] },
+  pergolas: {
+    realisations: range("s-pergola", 3),
+    montage: ["sch-pergola"],
+    accessoires: ["x-perg-ancrage", "x-perg-bas", "x-perg-haut", "x-perg-droit", "x-perg-angle", "x-perg-l", "x-perg-u", "x-perg-tige"],
+  },
+};
+
+export const CATEGORIES: Categorie[] = CATEGORIES_BASE.map((c) => {
+  const m = MEDIA_CATEGORIES[c.id];
+  return {
+    ...c,
+    realisations: m?.realisations.map(img),
+    montage: m?.montage?.map(img),
+    accessoires: c.accessoires?.map((a, i) => ({
+      ...a,
+      image: m?.accessoires?.[i] ? img(m.accessoires[i]) : undefined,
+    })),
+    produits: c.produits.map((p) => {
+      const pm = MEDIA_PRODUITS[p.id];
+      return pm
+        ? { ...p, visuel: img(pm.visuel), situation: pm.situation.map(img), folio: pm.folio && img(pm.folio) }
+        : p;
+    }),
+  };
+});
+
+export const TOUS_PRODUITS = CATEGORIES.flatMap((c) =>
+  c.produits.map((p) => ({ ...p, categorie: c })),
+);
+
+export function getProduit(id: string) {
+  return TOUS_PRODUITS.find((p) => p.id === id);
+}
+
+/** Les 13 propriétés du composite, avec leur picto vert du catalogue. */
 export const ATOUTS = [
   { titre: "100 % recyclable", texte: "Le composite bois est entièrement recyclable." },
   { titre: "Longue durée de vie", texte: "Une tenue dans le temps sans déformation." },
@@ -400,6 +526,8 @@ export const ATOUTS = [
   { titre: "Antidérapant", texte: "Sécurisant autour des piscines." },
   { titre: "Ne pourrit pas", texte: "Aucune putréfaction au contact de l'eau." },
 ];
+
+export const ATOUTS_PICTOS = ATOUTS.map((a, i) => ({ ...a, picto: img(`picto-${i}`) }));
 
 export function getCategorie(id: string) {
   return CATEGORIES.find((c) => c.id === id);

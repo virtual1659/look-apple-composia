@@ -493,10 +493,10 @@ export const CATEGORIES: Categorie[] = CATEGORIES_BASE.map((c) => {
       ...a,
       image: m?.accessoires?.[i] ? img(m.accessoires[i]) : undefined,
     })),
-    produits: c.produits.map((p) => {
+    produits: c.produits.map((p): Produit => {
       const pm = MEDIA_PRODUITS[p.id];
       return pm
-        ? { ...p, visuel: img(pm.visuel), situation: pm.situation.map(img), folio: pm.folio && img(pm.folio) }
+        ? { ...p, visuel: img(pm.visuel), situation: pm.situation.map(img), folio: pm.folio ? img(pm.folio) : undefined }
         : p;
     }),
   };

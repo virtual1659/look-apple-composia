@@ -121,3 +121,23 @@
 @utility hero-overlay {
   background: linear-gradient(180deg, oklch(0.15 0.01 60 / 0.15) 0%, oklch(0.15 0.01 60 / 0.75) 100%);
 }
+
+/* Motion design : apparitions subtiles au défilement */
+html:not(.reveal-off) [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+}
+html:not(.reveal-off) main img[data-reveal] {
+  transform: scale(1.03);
+}
+html:not(.reveal-off) [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+main section[data-reveal] { transform: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
+}

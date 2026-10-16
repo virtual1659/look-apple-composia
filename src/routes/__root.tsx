@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { RevealObserver } from "../components/Reveal";
 
 function NotFoundComponent() {
   return (
@@ -144,6 +145,7 @@ function RootComponent() {
           </nav>
         </div>
       </header>
+      <RevealObserver />
       <main>
         <Outlet />
       </main>

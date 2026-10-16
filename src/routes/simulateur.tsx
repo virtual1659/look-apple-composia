@@ -52,8 +52,8 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
 function Simulateur() {
   const [photo, setPhoto] = useState<Photo | null>(null);
   const [surface, setSurface] = useState<"sol" | "mur">("sol");
-  const [materialId, setMaterialId] = useState(MATERIALS[0].id);
-  const [colorId, setColorId] = useState(COLORS[2].id);
+  const [materialId, setMaterialId] = useState(MATERIALS[0]!.id);
+  const [colorId, setColorId] = useState(COLORS[2]!.id);
   const [result, setResult] = useState<string | null>(null);
   const [final, setFinal] = useState(false);
   const [loading, setLoading] = useState(false);

@@ -24,7 +24,7 @@ function Catalogue() {
       <div className="mt-12 space-y-10">
         {MATERIALS.map((m, i) => (
           <article key={m.id} className="grid gap-8 rounded-2xl bg-card p-6 shadow-soft md:grid-cols-[280px_1fr] md:p-8">
-            <img src={COLORS[i % COLORS.length].swatch} alt={m.name} loading="lazy" className="aspect-square w-full rounded-xl object-cover" />
+            <img src={COLORS[i % COLORS.length]!.swatch} alt={m.name} loading="lazy" className="aspect-square w-full rounded-xl object-cover" />
             <div>
               <p className="text-sm text-muted-foreground">{m.subtitle}</p>
               <h2 className="mt-1 text-3xl">{m.name}</h2>

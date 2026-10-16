@@ -36,11 +36,11 @@ export const TEINTES_BOIS = TEINTES.filter((t) => t.id !== "gris-clair");
 export type Produit = {
   id: string;
   /** Vue produit (profilé) extraite du catalogue. */
-  visuel?: string;
+  visuel?: string | undefined;
   /** Photos de mise en situation réelle. */
-  situation?: string[];
+  situation?: string[] | undefined;
   /** Nuancier des films PVC extérieurs, pour les finitions filmées. */
-  folio?: string;
+  folio?: string | undefined;
   nom: string;
   finition: string;
   description: string;
@@ -55,11 +55,11 @@ export type Categorie = {
   image: string;
   galerie: { src: string; alt: string }[];
   produits: Produit[];
-  accessoires?: { nom: string; description: string; image?: string }[];
+  accessoires?: { nom: string; description: string; image?: string | undefined }[] | undefined;
   /** Photos de réalisations de la gamme. */
-  realisations?: string[];
+  realisations?: string[] | undefined;
   /** Photos de pose et schémas de montage. */
-  montage?: string[];
+  montage?: string[] | undefined;
 };
 
 const usageSol =
@@ -429,7 +429,7 @@ const IMAGES = import.meta.glob<{ url: string }>("../assets/cat/*.asset.json", {
 export function img(nom: string): string {
   const key = Object.keys(IMAGES).find((k) => /\/([^/]+)\.(jpg|png)\.asset\.json$/.exec(k)?.[1] === nom);
   if (!key) throw new Error(`Visuel catalogue manquant : ${nom}`);
-  return IMAGES[key].url;
+  return IMAGES[key]!.url;
 }
 
 const range = (prefix: string, n: number, from = 1) =>

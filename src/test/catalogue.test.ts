@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CATEGORIES, TEINTES, getCategorie } from "@/lib/catalogue";
+import { ATOUTS_PICTOS, CATEGORIES, TEINTES, getCategorie } from "@/lib/catalogue";
 
 describe("gammes composite", () => {
   it("propose 5 teintes sur les sols et les façades", () => {
@@ -22,5 +22,18 @@ describe("gammes composite", () => {
 
   it("couvre les quatre familles du catalogue", () => {
     expect(CATEGORIES.map((c) => c.id)).toEqual(["sols", "facades", "clotures", "pergolas"]);
+  });
+
+  it("donne à chaque produit un visuel et au moins une photo de mise en situation", () => {
+    for (const c of CATEGORIES) {
+      for (const p of c.produits) {
+        expect(p.visuel, p.id).toBeTruthy();
+        expect(p.situation?.length, p.id).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("affiche les 13 pictos des caractéristiques du composite", () => {
+    expect(ATOUTS_PICTOS).toHaveLength(13);
   });
 });

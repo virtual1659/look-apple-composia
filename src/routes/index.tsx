@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import heroPiscine from "@/assets/hero-piscine.jpg.asset.json";
-import { CATEGORIES, TEINTES, ATOUTS } from "@/lib/catalogue";
+import { CATEGORIES, TEINTES, img } from "@/lib/catalogue";
+import { Pictos } from "@/components/Pictos";
+import { PhotoGrid } from "@/components/Lightbox";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -85,6 +87,16 @@ function Index() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-5 pb-20">
+        <p className="eyebrow">Réalisations</p>
+        <h2 className="mt-3 max-w-2xl text-4xl">Des projets réels, en bord de mer comme en ville.</h2>
+        <PhotoGrid
+          photos={["a-sol-1", "a-sol-3", "a-fac-3", "a-sol-6", "s-pergola-1", "a-fac-6", "s-cloture-2", "a-bs-2"].map(img)}
+          alt="Réalisation en composite bois"
+          className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4"
+        />
+      </section>
+
       <section className="bg-ink py-20 text-ink-foreground">
         <div className="mx-auto grid max-w-6xl gap-10 px-5 md:grid-cols-2 md:items-center">
           <div>
@@ -117,14 +129,7 @@ function Index() {
       <section className="mx-auto max-w-6xl px-5 py-20">
         <p className="eyebrow">Propriétés</p>
         <h2 className="mt-3 max-w-2xl text-4xl">Pensé pour l'extérieur, durablement.</h2>
-        <dl className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {ATOUTS.slice(0, 6).map((a) => (
-            <div key={a.titre} className="border-t border-foreground/20 pt-4">
-              <dt className="font-semibold">{a.titre}</dt>
-              <dd className="mt-1 text-sm text-muted-foreground">{a.texte}</dd>
-            </div>
-          ))}
-        </dl>
+        <Pictos compact className="mt-12" />
         <Button asChild variant="secondary" className="mt-10">
           <Link to="/a-propos">Toutes les propriétés</Link>
         </Button>

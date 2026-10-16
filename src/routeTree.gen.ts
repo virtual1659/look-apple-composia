@@ -16,6 +16,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PoseRouteImport } from './routes/pose'
 import { Route as SimulateurRouteImport } from './routes/simulateur'
 import { Route as ApiSimulateRouteImport } from './routes/api/simulate'
+import { Route as CatalogueProduitIdRouteImport } from './routes/catalogue_.$produitId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const ApiSimulateRoute = ApiSimulateRouteImport.update({
   path: '/api/simulate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CatalogueProduitIdRoute = CatalogueProduitIdRouteImport.update({
+  id: '/catalogue_/$produitId',
+  path: '/catalogue/$produitId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/pose': typeof PoseRoute
   '/simulateur': typeof SimulateurRoute
   '/api/simulate': typeof ApiSimulateRoute
+  '/catalogue/$produitId': typeof CatalogueProduitIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/pose': typeof PoseRoute
   '/simulateur': typeof SimulateurRoute
   '/api/simulate': typeof ApiSimulateRoute
+  '/catalogue/$produitId': typeof CatalogueProduitIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/pose': typeof PoseRoute
   '/simulateur': typeof SimulateurRoute
   '/api/simulate': typeof ApiSimulateRoute
+  '/catalogue_/$produitId': typeof CatalogueProduitIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/pose'
     | '/simulateur'
     | '/api/simulate'
+    | '/catalogue/$produitId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/pose'
     | '/simulateur'
     | '/api/simulate'
+    | '/catalogue/$produitId'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/pose'
     | '/simulateur'
     | '/api/simulate'
+    | '/catalogue_/$produitId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   PoseRoute: typeof PoseRoute
   SimulateurRoute: typeof SimulateurRoute
   ApiSimulateRoute: typeof ApiSimulateRoute
+  CatalogueProduitIdRoute: typeof CatalogueProduitIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSimulateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/catalogue_/$produitId': {
+      id: '/catalogue_/$produitId'
+      path: '/catalogue/$produitId'
+      fullPath: '/catalogue/$produitId'
+      preLoaderRoute: typeof CatalogueProduitIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   PoseRoute: PoseRoute,
   SimulateurRoute: SimulateurRoute,
   ApiSimulateRoute: ApiSimulateRoute,
+  CatalogueProduitIdRoute: CatalogueProduitIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

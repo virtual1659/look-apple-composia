@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ATOUTS } from "@/lib/catalogue";
+import { Pictos } from "@/components/Pictos";
 import usine from "@/assets/cephe-vertical.jpg.asset.json";
 
 export const Route = createFileRoute("/a-propos")({
@@ -60,14 +60,7 @@ function APropos() {
       <section className="mt-20">
         <p className="eyebrow">Propriétés</p>
         <h2 className="mt-3 text-3xl md:text-4xl">Pourquoi le composite bois</h2>
-        <dl className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {ATOUTS.map((a) => (
-            <div key={a.titre} className="border-t border-foreground/20 pt-4">
-              <dt className="font-semibold">{a.titre}</dt>
-              <dd className="mt-1 text-sm text-muted-foreground">{a.texte}</dd>
-            </div>
-          ))}
-        </dl>
+        <Pictos className="mt-10" />
       </section>
 
       <Button asChild className="mt-14">

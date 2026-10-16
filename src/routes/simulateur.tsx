@@ -26,7 +26,7 @@ async function preparePhoto(file: File): Promise<Photo> {
   const img = new Image();
   img.src = URL.createObjectURL(file);
   await img.decode();
-  const scale = Math.min(1, 1536 / Math.max(img.naturalWidth, img.naturalHeight));
+  const scale = 1536 / Math.max(img.naturalWidth, img.naturalHeight);
   const w = Math.round(img.naturalWidth * scale);
   const h = Math.round(img.naturalHeight * scale);
   const c = document.createElement("canvas");

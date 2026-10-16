@@ -427,7 +427,7 @@ const IMAGES = import.meta.glob<{ url: string }>("../assets/cat/*.asset.json", {
 
 /** URL d'un visuel extrait du catalogue (src/assets/cat/<nom>.jpg). */
 export function img(nom: string): string {
-  const key = Object.keys(IMAGES).find((k) => /\/(.+)\.(jpg|png)\.asset\.json$/.exec(k)?.[1] === nom);
+  const key = Object.keys(IMAGES).find((k) => /\/([^/]+)\.(jpg|png)\.asset\.json$/.exec(k)?.[1] === nom);
   if (!key) throw new Error(`Visuel catalogue manquant : ${nom}`);
   return IMAGES[key].url;
 }

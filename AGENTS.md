@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- AI image edits go through the server route src/routes/api/simulate.ts; the prompt is built server-side from material/color ids (src/lib/materials.ts) so clients cannot inject prompts.

@@ -53,7 +53,7 @@ function FicheProduit() {
         <div className="space-y-4">
           {p.visuel && (
             <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-card p-8 shadow-soft">
-              <img src={p.visuel} alt={`Profilé ${p.nom}`} className="max-h-full w-full object-contain" />
+              <img src={p.visuel} alt={`Profilé ${p.nom}`} className="max-h-full w-full object-contain mix-blend-multiply" />
             </div>
           )}
           {p.situation?.[0] && (
@@ -138,7 +138,7 @@ function FicheProduit() {
                 params={{ produitId: o.id }}
                 className="rounded-xl bg-card p-4 shadow-soft transition-shadow hover:shadow-lg"
               >
-                {o.visuel && <img src={o.visuel} alt="" loading="lazy" className="aspect-[4/3] w-full object-contain" />}
+                {o.visuel && <img src={o.visuel} alt="" loading="lazy" className="aspect-[4/3] w-full object-contain mix-blend-multiply" />}
                 <p className="mt-2 font-semibold">{o.nom}</p>
                 <p className="text-xs text-muted-foreground">{o.finition}</p>
               </Link>

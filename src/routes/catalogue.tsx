@@ -81,7 +81,7 @@ function Catalogue() {
                       src={p.visuel}
                       alt={`Profilé ${p.nom}`}
                       loading="lazy"
-                      className="mb-4 aspect-[16/9] w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      className="mb-4 aspect-[16/9] w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
                     />
                   )}
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">{p.finition}</p>

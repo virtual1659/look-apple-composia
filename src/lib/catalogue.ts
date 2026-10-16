@@ -67,7 +67,7 @@ export const CATEGORIES: Categorie[] = [
     titre: "Sols & terrasses",
     intro:
       "Lames de terrasse composite alvéolaires ou pleines, en finition bois embossé, rainures larges ou film PVC. Pose sur lambourdes composite, aluminium ou plots réglables.",
-    image: solHotel.url,
+    image: solTerrasse.url,
     galerie: [
       { src: solHotel.url, alt: "Plage de piscine d'hôtel en lames composite" },
       { src: solCabanas.url, alt: "Terrasse composite avec cabanas en bord de mer" },

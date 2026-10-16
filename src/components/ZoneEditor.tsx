@@ -80,7 +80,7 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
       const p = toCanvas(e);
       if (tool === "polygon") {
         if (points.length >= 3) {
-          const [fx, fy] = points[0];
+          const [fx, fy] = points[0]!;
           if (Math.hypot(fx - p[0], fy - p[1]) < width * 0.025) return closePolygon();
         }
         setPoints([...points, p]);
@@ -118,7 +118,7 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
     useImperativeHandle(ref, () => ({
       hasSelection: () => {
         const d = ctx().getImageData(0, 0, width, height).data;
-        for (let i = 3; i < d.length; i += 64) if (d[i] > 0) return true;
+        for (let i = 3; i < d.length; i += 64) if ((d[i] ?? 0) > 0) return true;
         return false;
       },
       getMask: () => {

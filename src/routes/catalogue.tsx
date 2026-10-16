@@ -1,14 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { COLORS, MATERIALS } from "@/lib/materials";
+import { CATEGORIES } from "@/lib/catalogue";
 
 export const Route = createFileRoute("/catalogue")({
   head: () => ({
     meta: [
-      { title: "Catalogue composite · Composia" },
-      { name: "description", content: "Lames de terrasse ARE-DECK et bardages ARE-WALL : caractéristiques techniques et nuancier." },
-      { property: "og:title", content: "Catalogue composite · Composia" },
-      { property: "og:description", content: "Terrasses et bardages composites en cinq teintes bois." },
+      { title: "Catalogue composite · sols, façades, clôtures, pergolas" },
+      {
+        name: "description",
+        content:
+          "Lames de terrasse ARE-DECK, panneaux de façade, clins, brise-soleil, clôtures et pergolas en composite bois : dimensions, finitions et teintes.",
+      },
+      { property: "og:title", content: "Catalogue composite · sols, façades, clôtures, pergolas" },
+      {
+        property: "og:description",
+        content: "Toute la gamme de profilés composite bois, avec ses dimensions et ses cinq teintes.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -19,38 +26,105 @@ export const Route = createFileRoute("/catalogue")({
 function Catalogue() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-16">
-      <p className="eyebrow">Catalogue</p>
-      <h1 className="mt-3 text-4xl md:text-6xl">Nos composites</h1>
-      <div className="mt-12 space-y-10">
-        {MATERIALS.map((m, i) => (
-          <article key={m.id} className="grid gap-8 rounded-2xl bg-card p-6 shadow-soft md:grid-cols-[280px_1fr] md:p-8">
-            <img src={COLORS[i % COLORS.length]!.swatch} alt={m.name} loading="lazy" className="aspect-square w-full rounded-xl object-cover" />
-            <div>
-              <p className="text-sm text-muted-foreground">{m.subtitle}</p>
-              <h2 className="mt-1 text-3xl">{m.name}</h2>
-              <p className="mt-3 text-muted-foreground">{m.description}</p>
-              <dl className="mt-5 grid grid-cols-3 gap-4 border-y py-4">
-                {m.specs.map((s) => (
-                  <div key={s.label}>
-                    <dt className="text-xs text-muted-foreground">{s.label}</dt>
-                    <dd className="font-semibold">{s.value}</dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {COLORS.map((c) => (
-                  <span key={c.id} className="flex items-center gap-2 rounded-full border px-3 py-1 text-xs">
-                    <img src={c.swatch} alt="" className="h-4 w-4 rounded-full object-cover" />
-                    {c.label}
-                  </span>
-                ))}
-              </div>
-              <Button asChild className="mt-6">
-                <Link to="/simulateur">Essayer sur ma photo</Link>
-              </Button>
-            </div>
-          </article>
+      <p className="eyebrow">Catalogue 2025</p>
+      <h1 className="mt-3 text-4xl md:text-6xl">Toute la gamme composite</h1>
+      <p className="mt-5 max-w-2xl text-muted-foreground">
+        Des profilés composés pour moitié de farine de bois et pour moitié de polymère, produits sur
+        lignes entièrement automatisées. Quatre familles, une même texture bois.
+      </p>
+
+      <nav className="mt-8 flex flex-wrap gap-3">
+        {CATEGORIES.map((c) => (
+          <a
+            key={c.id}
+            href={`#${c.id}`}
+            className="rounded-full border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
+          >
+            {c.titre}
+          </a>
         ))}
+      </nav>
+
+      <div className="mt-16 space-y-24">
+        {CATEGORIES.map((cat) => (
+          <section key={cat.id} id={cat.id} className="scroll-mt-24">
+            <div className="grid gap-8 md:grid-cols-[1fr_1fr] md:items-center">
+              <img
+                src={cat.image}
+                alt={cat.galerie[0]?.alt ?? cat.titre}
+                loading="lazy"
+                className="aspect-[4/3] w-full rounded-2xl object-cover shadow-soft"
+              />
+              <div>
+                <h2 className="text-3xl md:text-4xl">{cat.titre}</h2>
+                <p className="mt-4 text-muted-foreground">{cat.intro}</p>
+              </div>
+            </div>
+
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {cat.produits.map((p) => (
+                <article key={p.id} className="rounded-2xl bg-card p-6 shadow-soft">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{p.finition}</p>
+                  <h3 className="mt-1 text-xl">{p.nom}</h3>
+                  <p className="mt-3 text-sm text-muted-foreground">{p.description}</p>
+                  <dl className="mt-5 space-y-1 border-t pt-4 text-sm">
+                    {p.specs.map((s) => (
+                      <div key={s.label} className="flex justify-between gap-4">
+                        <dt className="text-muted-foreground">{s.label}</dt>
+                        <dd className="font-semibold">{s.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <ul className="mt-4 flex flex-wrap gap-2">
+                    {p.teintes.map((t) => (
+                      <li key={t.id} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <img src={t.swatch} alt="" className="h-4 w-4 rounded-full object-cover" />
+                        {t.label}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+
+            {cat.accessoires && (
+              <div className="mt-10 rounded-2xl border p-6">
+                <h3 className="text-xl">Accessoires {cat.titre.toLowerCase()}</h3>
+                <dl className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {cat.accessoires.map((a) => (
+                    <div key={a.nom}>
+                      <dt className="font-semibold">{a.nom}</dt>
+                      <dd className="mt-1 text-sm text-muted-foreground">{a.description}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              {cat.galerie.slice(1).map((g) => (
+                <img
+                  key={g.src}
+                  src={g.src}
+                  alt={g.alt}
+                  loading="lazy"
+                  className="aspect-[4/3] w-full rounded-xl object-cover"
+                />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <div className="mt-20 rounded-2xl bg-ink p-8 text-ink-foreground md:p-12">
+        <h2 className="text-3xl">Un projet en tête ?</h2>
+        <p className="mt-3 max-w-xl opacity-80">
+          Dites-nous les surfaces à couvrir et la teinte envisagée : nous revenons vers vous avec un
+          chiffrage.
+        </p>
+        <Button asChild variant="secondary" className="mt-6">
+          <Link to="/contact">Demander un devis</Link>
+        </Button>
       </div>
     </div>
   );

@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - AI image edits go through the server route src/routes/api/simulate.ts; the prompt is built server-side from material/color ids (src/lib/materials.ts) so clients cannot inject prompts.
+- Product catalogue content (categories, products, specs, finishes, colours, gallery photos) lives in src/lib/catalogue.ts; pages render from it so copy changes stay in one place. src/lib/materials.ts stays dedicated to the AI simulator.

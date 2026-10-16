@@ -10,14 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as CatalogueRouteImport } from './routes/catalogue'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as PoseRouteImport } from './routes/pose'
 import { Route as SimulateurRouteImport } from './routes/simulateur'
 import { Route as ApiSimulateRouteImport } from './routes/api/simulate'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AProposRoute = AProposRouteImport.update({
+  id: '/a-propos',
+  path: '/a-propos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogueRoute = CatalogueRouteImport.update({
@@ -28,6 +35,11 @@ const CatalogueRoute = CatalogueRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoseRoute = PoseRouteImport.update({
+  id: '/pose',
+  path: '/pose',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SimulateurRoute = SimulateurRouteImport.update({
@@ -43,44 +55,68 @@ const ApiSimulateRoute = ApiSimulateRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
   '/catalogue': typeof CatalogueRoute
   '/contact': typeof ContactRoute
+  '/pose': typeof PoseRoute
   '/simulateur': typeof SimulateurRoute
   '/api/simulate': typeof ApiSimulateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
   '/catalogue': typeof CatalogueRoute
   '/contact': typeof ContactRoute
+  '/pose': typeof PoseRoute
   '/simulateur': typeof SimulateurRoute
   '/api/simulate': typeof ApiSimulateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
   '/catalogue': typeof CatalogueRoute
   '/contact': typeof ContactRoute
+  '/pose': typeof PoseRoute
   '/simulateur': typeof SimulateurRoute
   '/api/simulate': typeof ApiSimulateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogue' | '/contact' | '/simulateur' | '/api/simulate'
+  fullPaths:
+    | '/'
+    | '/a-propos'
+    | '/catalogue'
+    | '/contact'
+    | '/pose'
+    | '/simulateur'
+    | '/api/simulate'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogue' | '/contact' | '/simulateur' | '/api/simulate'
+  to:
+    | '/'
+    | '/a-propos'
+    | '/catalogue'
+    | '/contact'
+    | '/pose'
+    | '/simulateur'
+    | '/api/simulate'
   id:
     | '__root__'
     | '/'
+    | '/a-propos'
     | '/catalogue'
     | '/contact'
+    | '/pose'
     | '/simulateur'
     | '/api/simulate'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AProposRoute: typeof AProposRoute
   CatalogueRoute: typeof CatalogueRoute
   ContactRoute: typeof ContactRoute
+  PoseRoute: typeof PoseRoute
   SimulateurRoute: typeof SimulateurRoute
   ApiSimulateRoute: typeof ApiSimulateRoute
 }
@@ -92,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/a-propos': {
+      id: '/a-propos'
+      path: '/a-propos'
+      fullPath: '/a-propos'
+      preLoaderRoute: typeof AProposRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogue': {
@@ -106,6 +149,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pose': {
+      id: '/pose'
+      path: '/pose'
+      fullPath: '/pose'
+      preLoaderRoute: typeof PoseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/simulateur': {
@@ -127,8 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AProposRoute: AProposRoute,
   CatalogueRoute: CatalogueRoute,
   ContactRoute: ContactRoute,
+  PoseRoute: PoseRoute,
   SimulateurRoute: SimulateurRoute,
   ApiSimulateRoute: ApiSimulateRoute,
 }

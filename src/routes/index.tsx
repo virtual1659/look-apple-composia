@@ -4,6 +4,18 @@ import { ChevronRight, ChevronsLeftRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroPiscine from "@/assets/hero-piscine.jpg.asset.json";
 import heroApres from "@/assets/hero-piscine-apres.jpg.asset.json";
+import apresGris from "@/assets/hero-apres-gris-clair.jpg";
+import apresChene from "@/assets/hero-apres-chene-clair.jpg";
+import apresCafeClair from "@/assets/hero-apres-cafe-clair.jpg";
+import apresCafeFonce from "@/assets/hero-apres-cafe-fonce.jpg";
+
+const APRES: Record<string, string> = {
+  "gris-clair": apresGris,
+  "chene-clair": apresChene,
+  "cafe-clair": apresCafeClair,
+  "cafe-fonce": apresCafeFonce,
+  anthracite: heroApres.url,
+};
 import { ATOUTS, ATOUTS_PICTOS, CATEGORIES, TEINTES, TOUS_PRODUITS, img } from "@/lib/catalogue";
 
 export const Route = createFileRoute("/")({
@@ -65,14 +77,14 @@ function Index() {
           </Button>
         </div>
 
-        <div className="relative mt-12 select-none overflow-hidden rounded-[2rem] shadow-soft">
+        <div className="no-reveal relative mt-12 select-none overflow-hidden rounded-[2rem] shadow-soft">
           <img
             src={heroPiscine.url}
             alt="Plage de piscine avant : lames bois clair"
             className="aspect-[16/10] w-full object-cover md:aspect-[16/8]"
           />
           <img
-            src={heroApres.url}
+            src={APRES[teinte] ?? heroApres.url}
             alt="Plage de piscine après : lames composite anthracite"
             className="absolute inset-0 h-full w-full object-cover"
             style={{ clipPath: `inset(0 0 0 ${pos}%)` }}
@@ -89,7 +101,7 @@ function Index() {
             className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
           />
           <span className="glass pointer-events-none absolute top-4 left-4 rounded-full px-3 py-1 text-xs font-medium">Avant</span>
-          <span className="glass pointer-events-none absolute top-4 right-4 rounded-full px-3 py-1 text-xs font-medium">Après · Anthracite</span>
+          <span className="glass pointer-events-none absolute top-4 right-4 rounded-full px-3 py-1 text-xs font-medium">Après · {TEINTES.find((t) => t.id === teinte)?.label}</span>
           <div className="absolute inset-x-0 bottom-5 flex justify-center">
             <div className="glass flex items-center gap-2 rounded-full p-1.5">
               <span className="px-2 text-xs font-medium">Teinte</span>
@@ -161,7 +173,7 @@ function Index() {
             </button>
           ))}
         </div>
-        <div className="mx-auto mt-12 flex max-w-2xl items-end justify-center gap-3 md:gap-5">
+        <div className="no-reveal mx-auto mt-12 flex max-w-2xl items-end justify-center gap-3 md:gap-5">
           {TEINTES.map((t) => {
             const on = teinte === t.id;
             const nb = produitsUsage.filter((p) => p.teintes.some((x) => x.id === t.id)).length;

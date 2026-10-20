@@ -2,7 +2,11 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "re
 import { Button } from "@/components/ui/button";
 
 type Tool = "polygon" | "brush" | "eraser";
-export type ZoneEditorHandle = { getMask: () => Promise<Blob | null>; hasSelection: () => boolean };
+export type ZoneEditorHandle = {
+  getMask: () => Promise<Blob | null>;
+  hasSelection: () => boolean;
+  fillPolygons: (polys: [number, number][][]) => void;
+};
 
 function makePattern(ctx: CanvasRenderingContext2D) {
   const p = document.createElement("canvas");
@@ -116,6 +120,23 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
     };
 
     useImperativeHandle(ref, () => ({
+      fillPolygons: (polys) => {
+        snapshot();
+        const c = ctx();
+        c.clearRect(0, 0, width, height);
+        c.globalCompositeOperation = "source-over";
+        c.fillStyle = makePattern(c);
+        for (const pts of polys) {
+          c.beginPath();
+          pts.forEach(([x, y], i) => {
+            const px = (x / 1000) * width, py = (y / 1000) * height;
+            if (i) c.lineTo(px, py); else c.moveTo(px, py);
+          });
+          c.closePath();
+          c.fill();
+        }
+        setPoints([]);
+      },
       hasSelection: () => {
         const d = ctx().getImageData(0, 0, width, height).data;
         for (let i = 3; i < d.length; i += 64) if ((d[i] ?? 0) > 0) return true;

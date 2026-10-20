@@ -218,11 +218,11 @@ function Contact() {
       <section className="mx-auto max-w-6xl px-5 py-24">
         <h2 className="text-center text-4xl">Pas un devis ? Par ici.</h2>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {[
+          {([
             ["Simulateur IA", "Visualisez la lame et la teinte sur votre photo.", "/simulateur"],
             ["Pose & accessoires", "Ossature, entraxe, fixation, compatibilité.", "/pose"],
             ["Catalogue", "Tous les profilés, teintes et finitions.", "/catalogue"],
-          ].map(([t, d, to]) => (
+          ] as const).map(([t, d, to]) => (
             <Link key={t} to={to} className="rounded-3xl bg-muted p-6 transition hover:bg-accent">
               <p className="text-lg font-semibold">{t}</p>
               <p className="mt-2 text-sm text-muted-foreground">{d}</p>

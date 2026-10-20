@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
+import { Camera, Check, Maximize, Sun, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ZoneEditor, type ZoneEditorHandle } from "@/components/ZoneEditor";
 import { BeforeAfter } from "@/components/BeforeAfter";
@@ -41,13 +42,28 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
   return (
     <section className="space-y-4">
       <div className="flex items-baseline gap-3">
-        <span className="font-display text-3xl text-primary">0{n}</span>
-        <h2 className="text-2xl">{title}</h2>
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">{n}</span>
+        <h2 className="text-xl">{title}</h2>
       </div>
       {children}
     </section>
   );
 }
+
+const conseils = [
+  { i: Sun, t: "Lumière du jour", d: "Évitez le contre-jour et la nuit : le rendu sera plus fidèle." },
+  { i: Maximize, t: "Cadrage large", d: "Prenez toute la surface et un peu de contexte autour." },
+  { i: Mountain, t: "Zone dégagée", d: "Limitez les meubles et pieds de chaises dans la zone à recouvrir." },
+  { i: Camera, t: "Bonne résolution", d: "Une photo de téléphone récent suffit. JPG ou PNG." },
+];
+
+const faq = [
+  { q: "Le rendu est-il fidèle à la réalité ?", r: "C'est une aide à la décision. Pour valider la teinte, demandez un échantillon." },
+  { q: "Ça fonctionne pour une façade ?", r: "Oui : choisissez « Mur de façade » et délimitez le mur en évitant les fenêtres." },
+  { q: "Puis-je simuler plusieurs zones ?", r: "Faites une zone à la fois, puis relancez sur la nouvelle image si besoin." },
+  { q: "Que devient ma photo ?", r: "Elle sert uniquement à générer le rendu et n'est pas conservée sur le site." },
+  { q: "Est-ce gratuit ?", r: "Oui, le simulateur est gratuit et sans inscription." },
+];
 
 function Simulateur() {
   const [photo, setPhoto] = useState<Photo | null>(null);
@@ -104,14 +120,37 @@ function Simulateur() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-12 md:py-16">
-      <p className="eyebrow">Simulateur IA</p>
-      <h1 className="mt-3 max-w-3xl text-4xl md:text-6xl">Voyez votre projet avant de le poser.</h1>
-      <p className="mt-4 max-w-2xl text-muted-foreground">
-        Importez une photo de votre terrasse, de votre piscine ou de votre façade, délimitez la zone et choisissez votre composite.
-      </p>
+    <>
+    <div className="mx-auto max-w-6xl px-5 pt-16 md:pt-24">
+      <div className="text-center">
+        <p className="eyebrow">Simulateur IA · Gratuit, sans inscription</p>
+        <h1 className="mt-4 text-5xl leading-[1.02] md:text-7xl">
+          Votre extérieur.
+          <br />
+          <span className="text-wood">Avant les travaux.</span>
+        </h1>
+        <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
+          Importez une photo de votre terrasse, piscine ou façade, délimitez la zone, choisissez la lame et la teinte : le rendu est prêt en quelques secondes.
+        </p>
+        <ul className="mt-6 flex flex-wrap justify-center gap-5 text-xs text-muted-foreground">
+          {["Sols et façades", `${COLORS.length} teintes`, "Rendu joint au devis"].map((t) => (
+            <li key={t} className="flex items-center gap-1.5">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="h-3 w-3" /></span>
+              {t}
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      <div className="mt-12 grid gap-12 lg:grid-cols-[1fr_360px]">
+      <div className="mt-12 rounded-[2rem] bg-warm p-3 md:p-6">
+      <div className="overflow-hidden rounded-3xl border bg-card shadow-soft">
+        <div className="flex items-center gap-2 border-b px-5 py-3">
+          <span className="h-3 w-3 rounded-full bg-destructive/70" />
+          <span className="h-3 w-3 rounded-full bg-sand" />
+          <span className="h-3 w-3 rounded-full bg-muted-foreground/30" />
+          <span className="ml-3 truncate text-xs text-muted-foreground">{photo ? `Photo · ${photo.width}×${photo.height}` : "Nouvelle simulation"}</span>
+        </div>
+      <div className="grid gap-10 p-5 md:p-8 lg:grid-cols-[1fr_340px]">
         <div className="space-y-12">
           <Step n={1} title="Importez votre photo">
             {!photo ? (
@@ -126,14 +165,14 @@ function Simulateur() {
                   setDragOver(false);
                   onFile(e.dataTransfer.files[0]);
                 }}
-                className={`flex aspect-[16/10] cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed text-center transition-colors ${dragOver ? "border-primary bg-accent/40" : "border-border bg-card hover:bg-muted"}`}
+                className={`flex aspect-[16/10] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed text-center transition-colors ${dragOver ? "border-primary bg-accent/40" : "border-border bg-card hover:bg-muted"}`}
               >
-                <span className="font-display text-2xl">Déposez votre photo ici</span>
+                <Camera className="h-8 w-8 text-primary" /><span className="text-xl font-semibold">Déposez votre photo ici</span>
                 <span className="text-sm text-muted-foreground">ou touchez pour choisir / prendre une photo · JPG, PNG</span>
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
               </label>
             ) : (
-              <div className="flex items-center justify-between rounded-lg bg-card p-3 text-sm">
+              <div className="flex items-center justify-between rounded-xl bg-muted p-3 text-sm">
                 <span className="text-muted-foreground">Photo chargée ({photo.width}×{photo.height})</span>
                 <label className="cursor-pointer font-semibold text-primary">
                   Changer de photo
@@ -152,16 +191,15 @@ function Simulateur() {
           {result && photo && (
             <div id="resultat" className="space-y-4">
               <div className="flex items-baseline gap-3">
-                <span className="font-display text-3xl text-primary">✦</span>
-                <h2 className="text-2xl">Votre avant / après</h2>
+                <h2 className="text-xl">Votre avant / après</h2>
               </div>
               <BeforeAfter before={photo.url} after={result} blur={!final} />
               {final && (
                 <div className="flex flex-wrap gap-3">
-                  <Button asChild>
+                  <Button asChild className="rounded-full">
                     <a href={result} download="projet-composite.png">Télécharger l'image</a>
                   </Button>
-                  <Button asChild variant="outline">
+                  <Button asChild variant="outline" className="rounded-full">
                     <Link to="/contact">Demander un devis</Link>
                   </Button>
                 </div>
@@ -170,14 +208,15 @@ function Simulateur() {
           )}
         </div>
 
-        <aside className="h-fit space-y-8 rounded-2xl bg-card p-6 shadow-soft lg:sticky lg:top-24">
+        <aside className="h-fit space-y-7 rounded-2xl bg-muted p-5 lg:sticky lg:top-24">
           <div>
-            <h3 className="text-lg">03 · Type de surface</h3>
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            <h3 className="text-xs font-medium text-muted-foreground">Type de surface</h3>
+            <div className="mt-2 grid grid-cols-2 gap-1 rounded-xl bg-card p-1">
               {(["sol", "mur"] as const).map((s) => (
                 <Button
                   key={s}
-                  variant={surface === s ? "default" : "outline"}
+                  size="sm"
+                  variant={surface === s ? "default" : "ghost"}
                   onClick={() => {
                     setSurface(s);
                     setMaterialId(MATERIALS.find((m) => m.surface === s)!.id);
@@ -189,22 +228,22 @@ function Simulateur() {
             </div>
           </div>
           <div>
-            <h3 className="text-lg">04 · Revêtement</h3>
+            <h3 className="text-xs font-medium text-muted-foreground">Lame</h3>
             <div className="mt-3 space-y-2">
               {materials.map((m) => (
                 <button
                   key={m.id}
                   onClick={() => setMaterialId(m.id)}
-                  className={`w-full rounded-lg border p-3 text-left transition-colors ${materialId === m.id ? "border-primary bg-accent/40" : "hover:bg-muted"}`}
+                  className={`w-full rounded-xl border p-3 text-left transition-colors ${materialId === m.id ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:bg-accent"}`}
                 >
                   <div className="font-semibold">{m.name}</div>
-                  <div className="text-xs text-muted-foreground">{m.subtitle}</div>
+                  <div className="text-xs opacity-70">{m.subtitle}</div>
                 </button>
               ))}
             </div>
           </div>
           <div>
-            <h3 className="text-lg">05 · Couleur</h3>
+            <h3 className="text-xs font-medium text-muted-foreground">Teinte</h3>
             <div className="mt-3 grid grid-cols-5 gap-2">
               {COLORS.map((c) => (
                 <button key={c.id} onClick={() => setColorId(c.id)} title={c.label} className="group space-y-1">
@@ -212,14 +251,14 @@ function Simulateur() {
                     src={c.swatch}
                     alt={c.label}
                     loading="lazy"
-                    className={`aspect-square w-full rounded-md object-cover ring-offset-2 ring-offset-card transition ${colorId === c.id ? "ring-2 ring-primary" : "group-hover:opacity-80"}`}
+                    className={`aspect-square w-full rounded-md object-cover ring-offset-2 ring-offset-muted transition ${colorId === c.id ? "ring-2 ring-primary" : "group-hover:opacity-80"}`}
                   />
                 </button>
               ))}
             </div>
             <p className="mt-2 text-sm font-semibold">{color.label}</p>
           </div>
-          <Button className="w-full" size="lg" disabled={!photo || loading} onClick={generate}>
+          <Button className="w-full rounded-full" size="lg" disabled={!photo || loading} onClick={generate}>
             {loading ? "Génération en cours…" : "Générer mon projet"}
           </Button>
           {loading && <p className="text-xs text-muted-foreground">Cela peut prendre jusqu'à une minute.</p>}
@@ -227,6 +266,50 @@ function Simulateur() {
           {!photo && <p className="text-xs text-muted-foreground">Commencez par importer une photo.</p>}
         </aside>
       </div>
+      </div>
+      </div>
     </div>
+
+    <section className="mt-20 bg-muted py-20">
+      <div className="mx-auto max-w-6xl px-5">
+        <div className="text-center">
+          <p className="eyebrow">Conseils</p>
+          <h2 className="mt-3 text-4xl">Une bonne photo. Un bon rendu.</h2>
+        </div>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {conseils.map((c) => (
+            <div key={c.t} className="rounded-3xl bg-card p-6 shadow-soft">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground"><c.i className="h-4 w-4" /></span>
+              <p className="mt-6 font-semibold">{c.t}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{c.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section className="mx-auto max-w-3xl px-5 py-20">
+      <h2 className="text-center text-4xl">Questions fréquentes.</h2>
+      <div className="mt-10 divide-y border-y">
+        {faq.map((f) => (
+          <details key={f.q} className="group py-4">
+            <summary className="flex cursor-pointer list-none items-center justify-between font-medium">
+              {f.q}
+              <span className="text-muted-foreground transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <p className="mt-3 text-sm text-muted-foreground">{f.r}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section className="mx-auto max-w-6xl px-5 pb-24 text-center">
+      <h2 className="text-4xl md:text-6xl">Un projet en tête <span className="text-wood">?</span></h2>
+      <div className="mt-7 flex flex-wrap justify-center gap-3">
+        <Button asChild className="rounded-full"><Link to="/contact">Demander un devis</Link></Button>
+        <Button asChild variant="ghost" className="rounded-full text-primary"><Link to="/catalogue">Voir le catalogue ›</Link></Button>
+      </div>
+    </section>
+    </>
   );
 }

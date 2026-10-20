@@ -165,11 +165,11 @@ function Catalogue() {
             </div>
             <p className="mt-3 max-w-xl text-muted-foreground">{cat.intro}</p>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className={`mt-10 grid gap-4 ${vue === "grille" ? "sm:grid-cols-2 lg:grid-cols-3" : ""}`}>
               {produits.map((p) => (
-                <div key={p.id} className="flex flex-col rounded-3xl border bg-card p-3 shadow-soft">
-                  <Link to="/catalogue/$produitId" params={{ produitId: p.id }} className="group block">
-                    <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-muted">
+                <div key={p.id} className={`flex rounded-3xl border bg-card p-3 shadow-soft ${vue === "grille" ? "flex-col" : "flex-col sm:flex-row sm:items-center sm:gap-4"}`}>
+                  <Link to="/catalogue/$produitId" params={{ produitId: p.id }} className={`group block ${vue === "liste" ? "sm:flex sm:flex-1 sm:items-center sm:gap-4" : ""}`}>
+                    <div className={`flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-muted ${vue === "liste" ? "sm:w-48 sm:shrink-0" : ""}`}>
                       {p.visuel && (
                         <img src={p.visuel} alt={`Profilé ${p.nom}`} loading="lazy" className="h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105" />
                       )}

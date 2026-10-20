@@ -35,7 +35,7 @@ export const Route = createFileRoute("/api/detect-zone")({
         const surface = input.get("surface") === "mur" ? "mur" : "sol";
         if (!(photo instanceof File) || photo.size > 6_000_000) return new Response("Photo requise", { status: 400 });
         const dataUrl = `data:${photo.type || "image/jpeg"};base64,${toBase64(await photo.arrayBuffer())}`;
-        const text = `${PROMPTS[surface]} Return one or more polygons tracing these areas precisely, each as a list of [x, y] points (8 to 40 points), with coordinates normalized from 0 to 1000 relative to image width (x) and height (y). Return an empty list if none.`;
+        const text = `${PROMPTS[surface]} Return one or more polygons tracing these areas precisely, each as a list of [x, y] points (12 to 60 points, placed densely along curved edges such as pool borders), with coordinates normalized from 0 to 1000 relative to image width (x) and height (y). Return an empty list if none.`;
 
         let upstream: Response;
         try {

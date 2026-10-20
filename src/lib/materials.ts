@@ -80,8 +80,8 @@ export function buildPrompt(materialId: string, colorId: string): string | null 
       : "The masked area is a building facade wall: clad the wall surface only. Windows, doors, frames, gutters, lights and railings must stay exactly as they are and stay visible.";
   return [
     "Photorealistic architectural renovation preview.",
-    `Replace ONLY the transparent (masked) area of the first image with ${m.promptDescription}, colour ${c.en}.`,
-    "Match the colour and texture of the second image (the material sample) exactly.",
+    `Replace ONLY the transparent (masked) area of the first image with ${m.promptDescription}, colour ${c.en} (approximately ${c.hex}).`,
+    `The new boards MUST be clearly ${c.en}: completely discard the original colour of the existing surface, do not keep or blend its hue. Match the colour and texture of the second image (the material sample) exactly.`,
     surfaceRule,
     "Respect the original perspective, vanishing lines, realistic scale, lighting, shadows and reflections.",
     "Keep everything outside the mask strictly identical: furniture, people, plants, water, sky, objects. Objects standing on the surface stay on top of it with their shadows.",

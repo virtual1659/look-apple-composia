@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { ChevronRight, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CATEGORIES } from "@/lib/catalogue";
+import { CATEGORIES, TEINTES, TOUS_PRODUITS } from "@/lib/catalogue";
 import { PhotoGrid } from "@/components/Lightbox";
-import { Pictos } from "@/components/Pictos";
 
 export const Route = createFileRoute("/catalogue")({
   head: () => ({
@@ -25,140 +26,238 @@ export const Route = createFileRoute("/catalogue")({
   component: Catalogue,
 });
 
+type P = (typeof TOUS_PRODUITS)[number];
+const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
 function Catalogue() {
+  const [q, setQ] = useState("");
+  const [famille, setFamille] = useState<string | null>(null);
+  const [teinte, setTeinte] = useState<string | null>(null);
+  const [compare, setCompare] = useState<string[]>([]);
+  const [showCompare, setShowCompare] = useState(false);
+
+  const nbAcc = CATEGORIES.reduce((n, c) => n + (c.accessoires?.length ?? 0), 0);
+  const match = (p: P) =>
+    (!teinte || p.teintes.some((t) => t.id === teinte)) &&
+    (!q || norm(`${p.nom} ${p.finition} ${p.description} ${p.specs.map((s) => s.value).join(" ")}`).includes(norm(q)));
+  const sections = CATEGORIES.filter((c) => !famille || c.id === famille)
+    .map((c) => ({ c, produits: c.produits.filter(match) }))
+    .filter((s) => s.produits.length);
+  const total = sections.reduce((n, s) => n + s.produits.length, 0);
+  const choisis = useMemo(() => TOUS_PRODUITS.filter((p) => compare.includes(p.id)), [compare]);
+  const toggle = (id: string) =>
+    setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length < 3 ? [...c, id] : c));
+
   return (
-    <div className="mx-auto max-w-6xl px-5 py-16">
-      <p className="eyebrow">Catalogue 2025</p>
-      <h1 className="mt-3 text-4xl md:text-6xl">Toute la gamme composite</h1>
-      <p className="mt-5 max-w-2xl text-muted-foreground">
-        Des profilés composés pour moitié de farine de bois et pour moitié de polymère, produits sur
-        lignes entièrement automatisées. Quatre familles, une même texture bois.
-      </p>
+    <>
+      <section className="mx-auto max-w-6xl px-5 pt-16 text-center md:pt-24">
+        <p className="eyebrow">Catalogue · {TOUS_PRODUITS.length} profilés · {nbAcc} accessoires</p>
+        <h1 className="mt-4 text-5xl leading-[1.02] md:text-7xl">
+          Trouvez le <span className="text-wood">bon profilé.</span>
+        </h1>
+        <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
+          50 % farine de bois, 50 % polymère, produits sur lignes automatisées. Quatre familles, une même texture bois.
+        </p>
+        <label className="mx-auto mt-7 flex max-w-md items-center gap-2 rounded-full bg-muted px-4 py-2.5 text-sm">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Référence, usage, dimension…" className="w-full bg-transparent outline-none" />
+          {q && <button type="button" onClick={() => setQ("")} aria-label="Effacer"><X className="h-4 w-4" /></button>}
+        </label>
 
-      <nav className="mt-8 flex flex-wrap gap-3">
-        {CATEGORIES.map((c) => (
-          <a
-            key={c.id}
-            href={`#${c.id}`}
-            className="rounded-full border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
-          >
-            {c.titre}
-          </a>
-        ))}
-      </nav>
+        <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
+          {CATEGORIES.map((c) => {
+            const on = famille === c.id;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setFamille(on ? null : c.id)}
+                className={`group relative overflow-hidden rounded-2xl border-2 text-left transition ${on ? "border-primary" : "border-transparent"}`}
+              >
+                <img src={c.image} alt="" className="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <span className="absolute inset-x-2 bottom-2 flex items-center justify-between rounded-xl border bg-background/70 px-3 py-2 backdrop-blur-xl">
+                  <span>
+                    <span className="block text-xs font-semibold">{c.titre}</span>
+                    <span className="block text-[11px] text-muted-foreground">{c.produits.length} profilés</span>
+                  </span>
+                  <ChevronRight className="h-4 w-4" />
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-      <section className="mt-12 rounded-2xl bg-card p-6 shadow-soft md:p-10">
-        <p className="eyebrow">Caractéristiques du composite</p>
-        <Pictos compact className="mt-6" />
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-2.5 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Teinte</span>
+            {TEINTES.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTeinte(teinte === t.id ? null : t.id)}
+                aria-label={t.label}
+                title={t.label}
+                className={`h-5 w-5 overflow-hidden rounded-full ring-offset-2 ${teinte === t.id ? "ring-2 ring-primary" : ""}`}
+              >
+                <img src={t.swatch} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 text-muted-foreground">
+            {(famille || teinte || q) && (
+              <button type="button" className="text-primary" onClick={() => { setFamille(null); setTeinte(null); setQ(""); }}>
+                Réinitialiser
+              </button>
+            )}
+            {total} résultat{total > 1 ? "s" : ""}
+          </div>
+        </div>
       </section>
 
-      <div className="mt-16 space-y-24">
-        {CATEGORIES.map((cat) => (
+      <div className="mx-auto max-w-6xl space-y-24 px-5 py-20">
+        {sections.length === 0 && <p className="text-center text-muted-foreground">Aucun profilé ne correspond à ces filtres.</p>}
+        {sections.map(({ c: cat, produits }) => (
           <section key={cat.id} id={cat.id} className="scroll-mt-24">
-            <div className="grid gap-8 md:grid-cols-[1fr_1fr] md:items-center">
-              <img
-                src={cat.image}
-                alt={cat.galerie[0]?.alt ?? cat.titre}
-                loading="lazy"
-                className="aspect-[4/3] w-full rounded-2xl object-cover shadow-soft"
-              />
-              <div>
-                <h2 className="text-3xl md:text-4xl">{cat.titre}</h2>
-                <p className="mt-4 text-muted-foreground">{cat.intro}</p>
-              </div>
+            <p className="eyebrow">{cat.titre}</p>
+            <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
+              <h2 className="text-4xl">{cat.titre}</h2>
             </div>
+            <p className="mt-3 max-w-xl text-muted-foreground">{cat.intro}</p>
 
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {cat.produits.map((p) => (
-                <Link
-                  key={p.id}
-                  to="/catalogue/$produitId"
-                  params={{ produitId: p.id }}
-                  className="group flex flex-col rounded-2xl bg-card p-6 shadow-soft transition-shadow hover:shadow-lg"
-                >
-                  {p.visuel && (
-                    <img
-                      src={p.visuel}
-                      alt={`Profilé ${p.nom}`}
-                      loading="lazy"
-                      className="mb-4 aspect-[16/9] w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
-                    />
-                  )}
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{p.finition}</p>
-                  <h3 className="mt-1 text-xl">{p.nom}</h3>
-                  <p className="mt-3 text-sm text-muted-foreground">{p.description}</p>
-                  <dl className="mt-5 space-y-1 border-t pt-4 text-sm">
-                    {p.specs.map((s) => (
-                      <div key={s.label} className="flex justify-between gap-4">
-                        <dt className="text-muted-foreground">{s.label}</dt>
-                        <dd className="font-semibold">{s.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                  <ul className="mt-4 flex flex-wrap gap-2">
-                    {p.teintes.map((t) => (
-                      <li key={t.id} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <img src={t.swatch} alt="" className="h-4 w-4 rounded-full object-cover" />
-                        {t.label}
-                      </li>
-                    ))}
-                  </ul>
-                  <span className="mt-auto pt-4 text-sm font-semibold text-primary">Voir la fiche →</span>
-                </Link>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {produits.map((p) => (
+                <div key={p.id} className="flex flex-col rounded-3xl border bg-card p-3 shadow-soft">
+                  <Link to="/catalogue/$produitId" params={{ produitId: p.id }} className="group block">
+                    <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-muted">
+                      {p.visuel && (
+                        <img src={p.visuel} alt={`Profilé ${p.nom}`} loading="lazy" className="h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105" />
+                      )}
+                    </div>
+                    <div className="px-2 pt-4">
+                      <p className="text-[11px] font-medium text-primary">{p.finition}</p>
+                      <h3 className="mt-1 text-lg">{p.nom}</h3>
+                      <p className="mt-1 text-xs text-muted-foreground">{p.specs.map((s) => s.value).join(" · ")}</p>
+                    </div>
+                  </Link>
+                  <div className="mt-auto flex items-center justify-between px-2 pt-4 pb-1">
+                    <div className="flex -space-x-1">
+                      {p.teintes.map((t) => (
+                        <img key={t.id} src={t.swatch} alt={t.label} title={t.label} className="h-4 w-4 rounded-full border-2 border-card object-cover" />
+                      ))}
+                    </div>
+                    <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+                      Comparer
+                      <input type="checkbox" checked={compare.includes(p.id)} onChange={() => toggle(p.id)} className="peer sr-only" />
+                      <span className="relative h-5 w-9 rounded-full bg-border transition peer-checked:bg-primary after:absolute after:top-0.5 after:left-0.5 after:h-4 after:w-4 after:rounded-full after:bg-card after:transition peer-checked:after:translate-x-4" />
+                    </label>
+                  </div>
+                </div>
               ))}
             </div>
 
             {cat.accessoires && (
-              <div className="mt-10 rounded-2xl border p-6">
-                <h3 className="text-xl">Accessoires {cat.titre.toLowerCase()}</h3>
-                <dl className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-10 rounded-3xl bg-muted p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl">Accessoires de pose</h3>
+                  <Link to="/pose" className="text-sm text-primary">Guide de pose ›</Link>
+                </div>
+                <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {cat.accessoires.map((a) => (
-                    <div key={a.nom}>
-                      {a.image && (
-                        <img src={a.image} alt="" loading="lazy" className="mb-3 aspect-[4/3] w-full rounded-lg bg-background object-contain" />
+                    <li key={a.nom} className="flex items-center gap-3 rounded-2xl bg-card p-3">
+                      {a.image ? (
+                        <img src={a.image} alt="" loading="lazy" className="h-12 w-12 shrink-0 rounded-lg object-contain" />
+                      ) : (
+                        <span className="h-12 w-12 shrink-0 rounded-lg bg-muted" />
                       )}
-                      <dt className="font-semibold">{a.nom}</dt>
-                      <dd className="mt-1 text-sm text-muted-foreground">{a.description}</dd>
-                    </div>
+                      <div>
+                        <p className="text-sm font-medium">{a.nom}</p>
+                        <p className="text-xs text-muted-foreground">{a.description}</p>
+                      </div>
+                    </li>
                   ))}
-                </dl>
+                </ul>
               </div>
             )}
 
             {cat.realisations && (
               <div className="mt-10">
                 <h3 className="text-xl">Réalisations</h3>
-                <PhotoGrid
-                  photos={cat.realisations}
-                  alt={`Réalisation ${cat.titre}`}
-                  className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4"
-                />
+                <PhotoGrid photos={cat.realisations} alt={`Réalisation ${cat.titre}`} className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4 [&_img]:rounded-2xl" />
               </div>
             )}
             {cat.montage && (
               <div className="mt-10">
                 <h3 className="text-xl">Montage &amp; ossature</h3>
-                <PhotoGrid
-                  photos={cat.montage}
-                  alt={`Montage ${cat.titre}`}
-                  className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4"
-                />
+                <PhotoGrid photos={cat.montage} alt={`Montage ${cat.titre}`} className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4 [&_img]:rounded-2xl" />
               </div>
             )}
           </section>
         ))}
       </div>
 
-      <div className="mt-20 rounded-2xl bg-ink p-8 text-ink-foreground md:p-12">
-        <h2 className="text-3xl">Un projet en tête ?</h2>
-        <p className="mt-3 max-w-xl opacity-80">
-          Dites-nous les surfaces à couvrir et la teinte envisagée : nous revenons vers vous avec un
-          chiffrage.
-        </p>
-        <Button asChild variant="secondary" className="mt-6">
-          <Link to="/contact">Demander un devis</Link>
-        </Button>
-      </div>
-    </div>
+      <section className="mx-auto max-w-6xl px-5 pb-24">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Link to="/simulateur" className="rounded-3xl bg-muted p-6 transition hover:bg-accent">
+            <p className="text-lg font-semibold">Simulateur IA</p>
+            <p className="mt-2 text-sm text-muted-foreground">Essayez une lame et une teinte sur votre photo.</p>
+            <p className="mt-4 text-sm text-primary">Essayer ›</p>
+          </Link>
+          <Link to="/pose" className="rounded-3xl bg-muted p-6 transition hover:bg-accent">
+            <p className="text-lg font-semibold">Pose & accessoires</p>
+            <p className="mt-2 text-sm text-muted-foreground">Ossature, clips, plots et visserie.</p>
+            <p className="mt-4 text-sm text-primary">Voir ›</p>
+          </Link>
+          <Link to="/contact" className="rounded-3xl bg-ink p-6 text-ink-foreground">
+            <p className="text-lg font-semibold">Demander un devis</p>
+            <p className="mt-2 text-sm opacity-70">Surface, gamme, teinte, pose : on chiffre votre projet.</p>
+            <p className="mt-4 text-sm text-primary">Commencer ›</p>
+          </Link>
+        </div>
+      </section>
+
+      {choisis.length > 0 && (
+        <div className="fixed inset-x-3 bottom-4 z-40 mx-auto max-w-3xl">
+          {showCompare && (
+            <div className="mb-2 max-h-[60vh] overflow-auto rounded-3xl border bg-background p-4 shadow-soft">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr>
+                    <th />
+                    {choisis.map((p) => (
+                      <th key={p.id} className="p-2 align-bottom">
+                        {p.visuel && <img src={p.visuel} alt="" className="mb-2 h-14 w-full object-contain mix-blend-multiply" />}
+                        <span className="text-sm font-semibold">{p.nom}</span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  <tr><td className="p-2 text-muted-foreground">Finition</td>{choisis.map((p) => <td key={p.id} className="p-2">{p.finition}</td>)}</tr>
+                  {Array.from(new Set(choisis.flatMap((p) => p.specs.map((s) => s.label)))).map((l) => (
+                    <tr key={l}>
+                      <td className="p-2 text-muted-foreground">{l}</td>
+                      {choisis.map((p) => <td key={p.id} className="p-2">{p.specs.find((s) => s.label === l)?.value ?? "—"}</td>)}
+                    </tr>
+                  ))}
+                  <tr><td className="p-2 text-muted-foreground">Teintes</td>{choisis.map((p) => <td key={p.id} className="p-2">{p.teintes.length}</td>)}</tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-3 rounded-full border bg-background/90 py-2 pr-2 pl-4 shadow-soft backdrop-blur-xl">
+            <div className="flex items-center gap-2 text-xs">
+              {choisis.map((p) => p.visuel && <img key={p.id} src={p.visuel} alt="" className="h-7 w-10 rounded bg-muted object-contain" />)}
+              <span>{choisis.length} profilé{choisis.length > 1 ? "s" : ""} sélectionné{choisis.length > 1 ? "s" : ""} (3 max)</span>
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost" className="rounded-full" onClick={() => { setCompare([]); setShowCompare(false); }}>Vider</Button>
+              <Button size="sm" className="rounded-full" disabled={choisis.length < 2} onClick={() => setShowCompare((v) => !v)}>
+                {showCompare ? "Masquer" : "Comparer"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

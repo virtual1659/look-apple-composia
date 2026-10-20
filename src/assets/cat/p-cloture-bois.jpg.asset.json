@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "4d20c5f5-5e5d-419f-af8c-6b61d6015840",
-  "project_id": "fa96525d-b938-45c2-a9f9-7d78e655a378",
-  "url": "/__l5e/assets-v1/4d20c5f5-5e5d-419f-af8c-6b61d6015840/p-cloture-bois.jpg",
-  "r2_key": "a/v1/fa96525d-b938-45c2-a9f9-7d78e655a378/4d20c5f5-5e5d-419f-af8c-6b61d6015840/p-cloture-bois.jpg",
-  "original_filename": "p-cloture-bois.jpg",
-  "size": 10037,
   "content_type": "image/jpeg",
-  "created_at": "2026-10-16T12:33:09Z"
+  "created_at": "2026-10-16T12:33:09Z",
+  "original_filename": "p-cloture-bois.jpg",
+  "project_id": "a6cfde1a-9f50-46c5-938a-29e5174937f9",
+  "r2_key": "a/v1/a6cfde1a-9f50-46c5-938a-29e5174937f9/4d20c5f5-5e5d-419f-af8c-6b61d6015840/p-cloture-bois.jpg",
+  "size": 10037,
+  "url": "/__l5e/assets-v1/4d20c5f5-5e5d-419f-af8c-6b61d6015840/p-cloture-bois.jpg",
+  "version": 1
 }

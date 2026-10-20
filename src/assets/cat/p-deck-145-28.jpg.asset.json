@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "b61db105-0ef5-48ef-a52d-34ce3d0bfe17",
-  "project_id": "fa96525d-b938-45c2-a9f9-7d78e655a378",
-  "url": "/__l5e/assets-v1/b61db105-0ef5-48ef-a52d-34ce3d0bfe17/p-deck-145-28.jpg",
-  "r2_key": "a/v1/fa96525d-b938-45c2-a9f9-7d78e655a378/b61db105-0ef5-48ef-a52d-34ce3d0bfe17/p-deck-145-28.jpg",
-  "original_filename": "p-deck-145-28.jpg",
-  "size": 17942,
   "content_type": "image/jpeg",
-  "created_at": "2026-10-16T12:37:47Z"
+  "created_at": "2026-10-16T12:37:47Z",
+  "original_filename": "p-deck-145-28.jpg",
+  "project_id": "a6cfde1a-9f50-46c5-938a-29e5174937f9",
+  "r2_key": "a/v1/a6cfde1a-9f50-46c5-938a-29e5174937f9/b61db105-0ef5-48ef-a52d-34ce3d0bfe17/p-deck-145-28.jpg",
+  "size": 17942,
+  "url": "/__l5e/assets-v1/b61db105-0ef5-48ef-a52d-34ce3d0bfe17/p-deck-145-28.jpg",
+  "version": 1
 }

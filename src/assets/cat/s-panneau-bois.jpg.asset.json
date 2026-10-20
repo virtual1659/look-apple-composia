@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "09cb117f-1840-44fa-aa41-02a26bdb2334",
-  "project_id": "fa96525d-b938-45c2-a9f9-7d78e655a378",
-  "url": "/__l5e/assets-v1/09cb117f-1840-44fa-aa41-02a26bdb2334/s-panneau-bois.jpg",
-  "r2_key": "a/v1/fa96525d-b938-45c2-a9f9-7d78e655a378/09cb117f-1840-44fa-aa41-02a26bdb2334/s-panneau-bois.jpg",
-  "original_filename": "s-panneau-bois.jpg",
-  "size": 95103,
   "content_type": "image/jpeg",
-  "created_at": "2026-10-16T12:33:37Z"
+  "created_at": "2026-10-16T12:33:37Z",
+  "original_filename": "s-panneau-bois.jpg",
+  "project_id": "a6cfde1a-9f50-46c5-938a-29e5174937f9",
+  "r2_key": "a/v1/a6cfde1a-9f50-46c5-938a-29e5174937f9/09cb117f-1840-44fa-aa41-02a26bdb2334/s-panneau-bois.jpg",
+  "size": 95103,
+  "url": "/__l5e/assets-v1/09cb117f-1840-44fa-aa41-02a26bdb2334/s-panneau-bois.jpg",
+  "version": 1
 }

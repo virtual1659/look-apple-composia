@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "f31251d6-4fd1-4f43-ae15-62ea325ac5f6",
-  "project_id": "fa96525d-b938-45c2-a9f9-7d78e655a378",
-  "url": "/__l5e/assets-v1/f31251d6-4fd1-4f43-ae15-62ea325ac5f6/f-decklam.jpg",
-  "r2_key": "a/v1/fa96525d-b938-45c2-a9f9-7d78e655a378/f31251d6-4fd1-4f43-ae15-62ea325ac5f6/f-decklam.jpg",
-  "original_filename": "f-decklam.jpg",
-  "size": 25696,
   "content_type": "image/jpeg",
-  "created_at": "2026-10-16T12:32:59Z"
+  "created_at": "2026-10-16T12:32:59Z",
+  "original_filename": "f-decklam.jpg",
+  "project_id": "a6cfde1a-9f50-46c5-938a-29e5174937f9",
+  "r2_key": "a/v1/a6cfde1a-9f50-46c5-938a-29e5174937f9/f31251d6-4fd1-4f43-ae15-62ea325ac5f6/f-decklam.jpg",
+  "size": 25696,
+  "url": "/__l5e/assets-v1/f31251d6-4fd1-4f43-ae15-62ea325ac5f6/f-decklam.jpg",
+  "version": 1
 }

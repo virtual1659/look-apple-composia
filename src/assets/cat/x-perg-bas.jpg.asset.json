@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "ec3687aa-986a-419f-8646-9fc4b1c8be11",
-  "project_id": "fa96525d-b938-45c2-a9f9-7d78e655a378",
-  "url": "/__l5e/assets-v1/ec3687aa-986a-419f-8646-9fc4b1c8be11/x-perg-bas.jpg",
-  "r2_key": "a/v1/fa96525d-b938-45c2-a9f9-7d78e655a378/ec3687aa-986a-419f-8646-9fc4b1c8be11/x-perg-bas.jpg",
-  "original_filename": "x-perg-bas.jpg",
-  "size": 6154,
   "content_type": "image/jpeg",
-  "created_at": "2026-10-16T12:33:48Z"
+  "created_at": "2026-10-16T12:33:48Z",
+  "original_filename": "x-perg-bas.jpg",
+  "project_id": "a6cfde1a-9f50-46c5-938a-29e5174937f9",
+  "r2_key": "a/v1/a6cfde1a-9f50-46c5-938a-29e5174937f9/ec3687aa-986a-419f-8646-9fc4b1c8be11/x-perg-bas.jpg",
+  "size": 6154,
+  "url": "/__l5e/assets-v1/ec3687aa-986a-419f-8646-9fc4b1c8be11/x-perg-bas.jpg",
+  "version": 1
 }

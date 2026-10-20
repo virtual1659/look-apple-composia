@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "eb33f8ed-df16-44b1-94b0-a3f58ce4d2e8",
-  "project_id": "fa96525d-b938-45c2-a9f9-7d78e655a378",
-  "url": "/__l5e/assets-v1/eb33f8ed-df16-44b1-94b0-a3f58ce4d2e8/sol-hotel.jpg",
-  "r2_key": "a/v1/fa96525d-b938-45c2-a9f9-7d78e655a378/eb33f8ed-df16-44b1-94b0-a3f58ce4d2e8/sol-hotel.jpg",
-  "original_filename": "sol-hotel.jpg",
-  "size": 269524,
   "content_type": "image/jpeg",
-  "created_at": "2026-10-16T11:48:42Z"
+  "created_at": "2026-10-16T11:48:42Z",
+  "original_filename": "sol-hotel.jpg",
+  "project_id": "a6cfde1a-9f50-46c5-938a-29e5174937f9",
+  "r2_key": "a/v1/a6cfde1a-9f50-46c5-938a-29e5174937f9/eb33f8ed-df16-44b1-94b0-a3f58ce4d2e8/sol-hotel.jpg",
+  "size": 269524,
+  "url": "/__l5e/assets-v1/eb33f8ed-df16-44b1-94b0-a3f58ce4d2e8/sol-hotel.jpg",
+  "version": 1
 }

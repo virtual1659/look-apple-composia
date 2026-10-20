@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "8baeb983-2adf-43c1-a528-912f3829b736",
-  "project_id": "fa96525d-b938-45c2-a9f9-7d78e655a378",
-  "url": "/__l5e/assets-v1/8baeb983-2adf-43c1-a528-912f3829b736/p-cloture-lisse.jpg",
-  "r2_key": "a/v1/fa96525d-b938-45c2-a9f9-7d78e655a378/8baeb983-2adf-43c1-a528-912f3829b736/p-cloture-lisse.jpg",
-  "original_filename": "p-cloture-lisse.jpg",
-  "size": 6343,
   "content_type": "image/jpeg",
-  "created_at": "2026-10-16T12:33:09Z"
+  "created_at": "2026-10-16T12:33:09Z",
+  "original_filename": "p-cloture-lisse.jpg",
+  "project_id": "a6cfde1a-9f50-46c5-938a-29e5174937f9",
+  "r2_key": "a/v1/a6cfde1a-9f50-46c5-938a-29e5174937f9/8baeb983-2adf-43c1-a528-912f3829b736/p-cloture-lisse.jpg",
+  "size": 6343,
+  "url": "/__l5e/assets-v1/8baeb983-2adf-43c1-a528-912f3829b736/p-cloture-lisse.jpg",
+  "version": 1
 }

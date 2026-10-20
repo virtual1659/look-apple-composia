@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "c2619f9f-9925-4ff2-b2d4-2c7065090868",
-  "project_id": "fa96525d-b938-45c2-a9f9-7d78e655a378",
-  "url": "/__l5e/assets-v1/c2619f9f-9925-4ff2-b2d4-2c7065090868/s-deck-145-22-plein.jpg",
-  "r2_key": "a/v1/fa96525d-b938-45c2-a9f9-7d78e655a378/c2619f9f-9925-4ff2-b2d4-2c7065090868/s-deck-145-22-plein.jpg",
-  "original_filename": "s-deck-145-22-plein.jpg",
-  "size": 73894,
   "content_type": "image/jpeg",
-  "created_at": "2026-10-16T12:33:33Z"
+  "created_at": "2026-10-16T12:33:33Z",
+  "original_filename": "s-deck-145-22-plein.jpg",
+  "project_id": "a6cfde1a-9f50-46c5-938a-29e5174937f9",
+  "r2_key": "a/v1/a6cfde1a-9f50-46c5-938a-29e5174937f9/c2619f9f-9925-4ff2-b2d4-2c7065090868/s-deck-145-22-plein.jpg",
+  "size": 73894,
+  "url": "/__l5e/assets-v1/c2619f9f-9925-4ff2-b2d4-2c7065090868/s-deck-145-22-plein.jpg",
+  "version": 1
 }

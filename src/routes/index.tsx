@@ -59,7 +59,7 @@ function Index() {
     <>
       <section className="mx-auto max-w-6xl px-5 pt-16 text-center md:pt-24">
         <p className="eyebrow">Composite bois · 50 % bois, 50 % polymère</p>
-        <h1 className="mt-4 text-5xl leading-[1.02] md:text-7xl">
+        <h1 className="mt-4 text-6xl leading-[0.98] md:text-[6.5rem]">
           Le bois.
           <br />
           <span className="text-wood">Sans l'entretien.</span>
@@ -140,7 +140,7 @@ function Index() {
         <div className="mx-auto max-w-6xl px-5">
           <div className="text-center">
             <p className="eyebrow">Nos gammes</p>
-            <h2 className="mt-3 text-4xl">Une matière. Quatre usages.</h2>
+            <h2 className="mt-3 text-4xl md:text-[3.5rem] md:leading-[1.05]">Une matière. Quatre usages.</h2>
             <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
               Lames, clins, brise-soleil, poteaux et poutres : tous les profilés partagent la même texture bois embossée.
             </p>
@@ -161,7 +161,7 @@ function Index() {
 
       <section className="mx-auto max-w-6xl px-5 py-20 text-center">
         <p className="eyebrow">Nuancier</p>
-        <h2 className="mt-3 text-4xl">Cinq teintes. Une texture bois.</h2>
+        <h2 className="mt-3 text-4xl md:text-[3.5rem] md:leading-[1.05]">Cinq teintes. Une texture bois.</h2>
         <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
           Résistant aux UV, à l'eau chlorée et aux taches. Ne se fend pas, ne grise pas, teinté dans la masse.
         </p>
@@ -198,7 +198,7 @@ function Index() {
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="eyebrow">Réalisations</p>
-            <h2 className="mt-3 text-4xl">En bord de mer.<br />Comme en ville.</h2>
+            <h2 className="mt-3 text-4xl md:text-[3.5rem] md:leading-[1.05]">En bord de mer.<br />Comme en ville.</h2>
           </div>
           <Link to="/catalogue" className="text-sm text-primary">Toutes les réalisations ›</Link>
         </div>
@@ -217,7 +217,7 @@ function Index() {
         <div className="mx-auto max-w-6xl px-5">
           <div className="text-center">
             <p className="eyebrow">Propriétés</p>
-            <h2 className="mt-3 text-4xl">Pensé pour durer dehors.</h2>
+            <h2 className="mt-3 text-4xl md:text-[3.5rem] md:leading-[1.05]">Pensé pour durer dehors.</h2>
           </div>
           <ul className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4">
             {ATOUTS_PICTOS.slice(0, 12).map((a) => (
@@ -236,7 +236,7 @@ function Index() {
 
       <section className="mx-auto max-w-6xl px-5 py-24 text-center">
         <p className="eyebrow">Votre projet</p>
-        <h2 className="mt-3 text-4xl md:text-6xl">Parlons de votre <span className="text-wood">extérieur.</span></h2>
+        <h2 className="mt-3 text-5xl md:text-[5rem] md:leading-[1]">Parlons de votre <span className="text-wood">extérieur.</span></h2>
         <p className="mx-auto mt-4 max-w-md text-muted-foreground">
           Surface, gamme, teinte, pose : envoyez-nous votre projet, un conseiller vous recontacte. {TOUS_PRODUITS.length} profilés disponibles.
         </p>

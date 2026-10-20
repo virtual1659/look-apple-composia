@@ -145,6 +145,44 @@ function MobileMenu({ onNavigate }: { onNavigate: () => void }) {
   );
 }
 
+const footerCols = [
+  { t: "Produits", l: [["Sols & terrasses", "/catalogue"], ["Façades & bardages", "/catalogue"], ["Clôtures", "/catalogue"], ["Pergolas", "/catalogue"]] },
+  { t: "Outils", l: [["Simulateur IA", "/simulateur"], ["Guide de pose", "/pose"]] },
+  { t: "Conseils", l: [["Pose & accessoires", "/pose"], ["Propriétés du composite", "/a-propos"]] },
+  { t: "Professionnels", l: [["Devenir revendeur", "/contact"], ["Grands projets", "/contact"]] },
+  { t: "Composia", l: [["À propos", "/a-propos"], ["Demander un devis", "/contact"]] },
+] as const;
+
+function SiteFooter() {
+  return (
+    <footer className="mt-10 bg-muted px-5 pt-12 pb-8 text-xs text-muted-foreground">
+      <div className="mx-auto max-w-6xl">
+        <p className="border-b pb-6">
+          * Données indicatives, à confirmer. Les rendus du simulateur IA sont une aide à la décision : commandez un échantillon pour valider la teinte.
+        </p>
+        <div className="grid grid-cols-2 gap-8 py-8 sm:grid-cols-5">
+          {footerCols.map((c) => (
+            <div key={c.t}>
+              <p className="font-semibold text-foreground">{c.t}</p>
+              <ul className="mt-3 space-y-2">
+                {c.l.map(([label, to]) => (
+                  <li key={label}>
+                    <Link to={to} className="hover:text-foreground">{label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between border-t pt-6">
+          <span>© {new Date().getFullYear()} Composia. Tous droits réservés.</span>
+          <span>France</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -158,26 +196,33 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
-          <Link to="/" className="font-display text-2xl">
+      <header className="sticky top-3 z-40 px-3">
+        <div className="mx-auto flex h-14 max-w-4xl items-center justify-between rounded-full border bg-background/80 pl-5 pr-2 shadow-soft backdrop-blur-xl">
+          <Link to="/" className="flex items-center gap-2 text-base font-semibold tracking-tight">
+            <span className="h-5 w-5 rounded-md" style={{ background: "var(--gradient-wood)" }} aria-hidden="true" />
             Composia
           </Link>
-          <nav className="hidden gap-4 text-sm font-medium sm:flex sm:gap-7">
-            {nav.map((n) => (
+          <nav className="hidden items-center gap-1 text-[13px] sm:flex">
+            {nav.filter((n) => n.to !== "/contact").map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
-                className="text-muted-foreground transition-colors hover:text-foreground"
-                activeProps={{ className: "text-foreground" }}
+                className="rounded-full px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "bg-muted text-foreground" }}
               >
                 {n.label}
               </Link>
             ))}
           </nav>
+          <Link
+            to="/contact"
+            className="hidden rounded-full bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:inline-flex"
+          >
+            Demander un devis
+          </Link>
           <button
             type="button"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-card text-foreground transition-colors hover:bg-accent/50 sm:hidden"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-accent sm:hidden"
             aria-expanded={menuOpen}
             aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             onClick={() => setMenuOpen((v) => !v)}
@@ -185,15 +230,17 @@ function RootComponent() {
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
-        {menuOpen && <MobileMenu onNavigate={() => setMenuOpen(false)} />}
+        {menuOpen && (
+          <div className="mx-auto mt-2 max-w-4xl rounded-3xl border bg-background/95 pt-5 shadow-soft backdrop-blur-xl sm:hidden">
+            <MobileMenu onNavigate={() => setMenuOpen(false)} />
+          </div>
+        )}
       </header>
       <RevealObserver />
       <main>
         <Outlet />
       </main>
-      <footer className="border-t py-10 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Composia · Terrasses et bardages composites
-      </footer>
+      <SiteFooter />
     </QueryClientProvider>
   );
 }

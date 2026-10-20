@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ChevronRight, Search, X } from "lucide-react";
+import { ChevronRight, LayoutGrid, List, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES, TEINTES, TOUS_PRODUITS, type Produit } from "@/lib/catalogue";
 import { PhotoGrid } from "@/components/Lightbox";
@@ -28,17 +28,32 @@ export const Route = createFileRoute("/catalogue")({
 
 type P = Produit;
 const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const STRUCTURES = ["Alvéolaire", "Pleine"] as const;
+const SURFACES = ["Embossé", "Rainures larges", "Film PVC"] as const;
+const structureDe = (p: P) => (/plein/.test(norm(p.finition)) ? "Pleine" : /alveol/.test(norm(p.finition)) ? "Alvéolaire" : null);
+const surfaceDe = (p: P) => {
+  const f = norm(`${p.finition} ${p.nom}`);
+  if (/film|pvc|folio/.test(f)) return "Film PVC";
+  if (/rainures larges/.test(f)) return "Rainures larges";
+  if (/emboss/.test(f)) return "Embossé";
+  return null;
+};
 
 function Catalogue() {
   const [q, setQ] = useState("");
   const [famille, setFamille] = useState<string | null>(null);
   const [teinte, setTeinte] = useState<string | null>(null);
+  const [structure, setStructure] = useState<string | null>(null);
+  const [surface, setSurface] = useState<string | null>(null);
+  const [vue, setVue] = useState<"grille" | "liste">("grille");
   const [compare, setCompare] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
 
   const nbAcc = CATEGORIES.reduce((n, c) => n + (c.accessoires?.length ?? 0), 0);
   const match = (p: P) =>
     (!teinte || p.teintes.some((t) => t.id === teinte)) &&
+    (!structure || structureDe(p) === structure) &&
+    (!surface || surfaceDe(p) === surface) &&
     (!q || norm(`${p.nom} ${p.finition} ${p.description} ${p.specs.map((s) => s.value).join(" ")}`).includes(norm(q)));
   const sections = CATEGORIES.filter((c) => !famille || c.id === famille)
     .map((c) => ({ c, produits: c.produits.filter(match) }))
@@ -72,13 +87,13 @@ function Catalogue() {
                 key={c.id}
                 type="button"
                 onClick={() => setFamille(on ? null : c.id)}
-                className={`group relative overflow-hidden rounded-2xl border-2 text-left transition ${on ? "border-primary" : "border-transparent"}`}
+                className={`group relative overflow-hidden rounded-3xl text-left ring-offset-2 ring-offset-background transition ${on ? "ring-[3px] ring-primary" : ""}`}
               >
                 <img src={c.image} alt="" className="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <span className="absolute inset-x-2 bottom-2 flex items-center justify-between rounded-xl border bg-background/70 px-3 py-2 backdrop-blur-xl">
+                <span className="glass absolute inset-x-2.5 bottom-2.5 flex items-center justify-between rounded-2xl px-4 py-3">
                   <span>
-                    <span className="block text-xs font-semibold">{c.titre}</span>
-                    <span className="block text-[11px] text-muted-foreground">{c.produits.length} profilés</span>
+                    <span className="block text-sm font-semibold">{c.titre}</span>
+                    <span className="block text-xs opacity-75">{c.produits.length} profilés</span>
                   </span>
                   <ChevronRight className="h-4 w-4" />
                 </span>
@@ -87,7 +102,29 @@ function Catalogue() {
           })}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-2.5 text-xs">
+        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl bg-muted px-4 py-3 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Structure</span>
+            <div className="flex rounded-xl bg-border/60 p-1">
+              {STRUCTURES.map((s) => (
+                <button key={s} type="button" onClick={() => setStructure(structure === s ? null : s)}
+                  className={`rounded-lg px-4 py-1.5 font-medium transition ${structure === s ? "bg-background shadow-soft" : "text-foreground/80"}`}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+          <span className="hidden h-6 w-px bg-border md:block" />
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-muted-foreground">Surface</span>
+            {SURFACES.map((s) => (
+              <button key={s} type="button" onClick={() => setSurface(surface === s ? null : s)}
+                className={`rounded-full border px-4 py-1.5 font-medium transition ${surface === s ? "border-foreground bg-foreground text-background" : "bg-background"}`}>
+                {s}
+              </button>
+            ))}
+          </div>
+          <span className="hidden h-6 w-px bg-border md:block" />
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">Teinte</span>
             {TEINTES.map((t) => (
@@ -97,19 +134,23 @@ function Catalogue() {
                 onClick={() => setTeinte(teinte === t.id ? null : t.id)}
                 aria-label={t.label}
                 title={t.label}
-                className={`h-5 w-5 overflow-hidden rounded-full ring-offset-2 ${teinte === t.id ? "ring-2 ring-primary" : ""}`}
+                className={`h-7 w-7 overflow-hidden rounded-full ring-offset-2 ring-offset-muted ${teinte === t.id ? "ring-2 ring-primary" : ""}`}
               >
                 <img src={t.swatch} alt="" className="h-full w-full object-cover" />
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-3 text-muted-foreground">
-            {(famille || teinte || q) && (
-              <button type="button" className="text-primary" onClick={() => { setFamille(null); setTeinte(null); setQ(""); }}>
+          <div className="ml-auto flex items-center gap-3 text-muted-foreground">
+            {(famille || teinte || q || structure || surface) && (
+              <button type="button" className="text-primary" onClick={() => { setFamille(null); setTeinte(null); setQ(""); setStructure(null); setSurface(null); }}>
                 Réinitialiser
               </button>
             )}
-            {total} résultat{total > 1 ? "s" : ""}
+            <span>{total} résultat{total > 1 ? "s" : ""}</span>
+            <div className="flex rounded-xl bg-border/60 p-1">
+              <button type="button" aria-label="Vue grille" onClick={() => setVue("grille")} className={`rounded-lg p-1.5 ${vue === "grille" ? "bg-background text-foreground shadow-soft" : ""}`}><LayoutGrid className="h-4 w-4" /></button>
+              <button type="button" aria-label="Vue liste" onClick={() => setVue("liste")} className={`rounded-lg p-1.5 ${vue === "liste" ? "bg-background text-foreground shadow-soft" : ""}`}><List className="h-4 w-4" /></button>
+            </div>
           </div>
         </div>
       </section>

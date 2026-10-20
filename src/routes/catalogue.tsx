@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ChevronRight, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CATEGORIES, TEINTES, TOUS_PRODUITS } from "@/lib/catalogue";
+import { CATEGORIES, TEINTES, TOUS_PRODUITS, type Produit } from "@/lib/catalogue";
 import { PhotoGrid } from "@/components/Lightbox";
 
 export const Route = createFileRoute("/catalogue")({
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/catalogue")({
   component: Catalogue,
 });
 
-type P = (typeof TOUS_PRODUITS)[number];
+type P = Produit;
 const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 function Catalogue() {

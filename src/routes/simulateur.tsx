@@ -261,7 +261,7 @@ function Simulateur() {
           )}
         </div>
 
-        <aside className="h-fit space-y-7 rounded-2xl bg-muted p-5 lg:sticky lg:top-24">
+        <aside className="no-reveal h-fit space-y-7 rounded-2xl bg-muted p-5 lg:sticky lg:top-24">
           <div>
             <h3 className="text-xs font-medium text-muted-foreground">Type de surface</h3>
             <div className="mt-2 grid grid-cols-2 gap-1 rounded-xl bg-card p-1">

@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 const PROMPTS = {
-  sol: "Identify the walkable floor surface in this photo where outdoor decking/flooring could be installed: terrace, deck, patio, paving or the ground around a swimming pool. Exclude water, pool interior, grass, furniture, walls, sky and vegetation.",
-  mur: "Identify the exterior facade wall surfaces of the building in this photo where cladding could be installed. Exclude windows, doors, roof, sky, ground and vegetation; if windows are inside the wall, trace the wall polygon around them as best possible.",
+  sol: "Identify the main floor covering in this photo (deck boards, tiles, paving, concrete…) that will be replaced by composite decking. First determine which single continuous material covers most of the terrace/floor, then select ONLY the area covered by that same material, following its exact boundaries where the material changes. Exclude anything made of a different material even if adjacent: pool coping/edge stones, stone or tile borders, curbs, steps of another material, drains, water, grass, planters, furniture, walls, sky and vegetation.",
+  mur: "Identify the main exterior facade covering in this photo (render, brick, stone, siding…) that will be replaced by composite cladding. First determine which single continuous material covers most of the wall, then select ONLY the area covered by that same material, following its exact boundaries where the material changes. Exclude windows, doors, frames, sills, trims and bands of another material, roof, gutters, ground, sky and vegetation.",
 } as const;
 
 const schema = {

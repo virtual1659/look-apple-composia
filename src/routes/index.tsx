@@ -31,7 +31,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [teinte, setTeinte] = useState(TEINTES[2]?.id ?? TEINTES[0].id);
+  const [teinte, setTeinte] = useState(TEINTES[2]?.id ?? "");
   const stats = [
     { v: String(CATEGORIES.length).padStart(2, "0"), l: "familles de profilés" },
     { v: String(TEINTES.length).padStart(2, "0"), l: "teintes embossées" },

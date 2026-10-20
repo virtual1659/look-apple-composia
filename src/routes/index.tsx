@@ -38,7 +38,8 @@ function Index() {
     { v: String(ATOUTS.length), l: "propriétés techniques" },
     { v: "0", l: "lasure, huile ou peinture" },
   ];
-  const [c0, c1, c2, c3] = CATEGORIES;
+  const grands = CATEGORIES.slice(0, 2);
+  const petits = CATEGORIES.slice(2, 4);
 
   return (
     <>
@@ -108,8 +109,8 @@ function Index() {
             </p>
           </div>
           <div className="mt-12 grid gap-4 md:grid-cols-6">
-            {[c0, c1].filter(Boolean).map((c) => <FamilyCard key={c.id} c={c} className="md:col-span-3 aspect-[4/3]" />)}
-            {[c2, c3].filter(Boolean).map((c) => <FamilyCard key={c.id} c={c} className="md:col-span-2 aspect-[4/3]" />)}
+            {grands.map((c) => <FamilyCard key={c.id} c={c} className="md:col-span-3 aspect-[4/3]" />)}
+            {petits.map((c) => <FamilyCard key={c.id} c={c} className="md:col-span-2 aspect-[4/3]" />)}
             <Link to="/pose" className="flex flex-col justify-between rounded-3xl bg-card p-6 shadow-soft md:col-span-2">
               <div>
                 <p className="eyebrow">Système de pose</p>

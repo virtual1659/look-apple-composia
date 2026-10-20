@@ -15,6 +15,7 @@ import { Route as CatalogueRouteImport } from './routes/catalogue'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PoseRouteImport } from './routes/pose'
 import { Route as SimulateurRouteImport } from './routes/simulateur'
+import { Route as ApiDetectZoneRouteImport } from './routes/api/detect-zone'
 import { Route as ApiSimulateRouteImport } from './routes/api/simulate'
 import { Route as CatalogueProduitIdRouteImport } from './routes/catalogue_.$produitId'
 
@@ -48,6 +49,11 @@ const SimulateurRoute = SimulateurRouteImport.update({
   path: '/simulateur',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDetectZoneRoute = ApiDetectZoneRouteImport.update({
+  id: '/api/detect-zone',
+  path: '/api/detect-zone',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSimulateRoute = ApiSimulateRouteImport.update({
   id: '/api/simulate',
   path: '/api/simulate',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/pose': typeof PoseRoute
   '/simulateur': typeof SimulateurRoute
+  '/api/detect-zone': typeof ApiDetectZoneRoute
   '/api/simulate': typeof ApiSimulateRoute
   '/catalogue/$produitId': typeof CatalogueProduitIdRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/pose': typeof PoseRoute
   '/simulateur': typeof SimulateurRoute
+  '/api/detect-zone': typeof ApiDetectZoneRoute
   '/api/simulate': typeof ApiSimulateRoute
   '/catalogue/$produitId': typeof CatalogueProduitIdRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/pose': typeof PoseRoute
   '/simulateur': typeof SimulateurRoute
+  '/api/detect-zone': typeof ApiDetectZoneRoute
   '/api/simulate': typeof ApiSimulateRoute
   '/catalogue_/$produitId': typeof CatalogueProduitIdRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pose'
     | '/simulateur'
+    | '/api/detect-zone'
     | '/api/simulate'
     | '/catalogue/$produitId'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pose'
     | '/simulateur'
+    | '/api/detect-zone'
     | '/api/simulate'
     | '/catalogue/$produitId'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pose'
     | '/simulateur'
+    | '/api/detect-zone'
     | '/api/simulate'
     | '/catalogue_/$produitId'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   PoseRoute: typeof PoseRoute
   SimulateurRoute: typeof SimulateurRoute
+  ApiDetectZoneRoute: typeof ApiDetectZoneRoute
   ApiSimulateRoute: typeof ApiSimulateRoute
   CatalogueProduitIdRoute: typeof CatalogueProduitIdRoute
 }
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimulateurRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/detect-zone': {
+      id: '/api/detect-zone'
+      path: '/api/detect-zone'
+      fullPath: '/api/detect-zone'
+      preLoaderRoute: typeof ApiDetectZoneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/simulate': {
       id: '/api/simulate'
       path: '/api/simulate'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   PoseRoute: PoseRoute,
   SimulateurRoute: SimulateurRoute,
+  ApiDetectZoneRoute: ApiDetectZoneRoute,
   ApiSimulateRoute: ApiSimulateRoute,
   CatalogueProduitIdRoute: CatalogueProduitIdRoute,
 }

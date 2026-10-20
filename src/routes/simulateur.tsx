@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Camera, Check, Maximize, Sun, Mountain } from "lucide-react";
+import { Camera, Check, Maximize, Sun, Mountain, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ZoneEditor, type ZoneEditorHandle } from "@/components/ZoneEditor";
 import { BeforeAfter } from "@/components/BeforeAfter";
@@ -80,11 +80,53 @@ function Simulateur() {
   const materials = MATERIALS.filter((m) => m.surface === surface);
   const color = COLORS.find((c) => c.id === colorId)!;
 
+  const [detecting, setDetecting] = useState(false);
+  const [detectMsg, setDetectMsg] = useState<string | null>(null);
+  const [detectedFor, setDetectedFor] = useState<"sol" | "mur" | null>(null);
+
+  const detect = async (p = photo) => {
+    if (!p) return;
+    setDetecting(true);
+    setDetectMsg(null);
+    try {
+      // Downsized JPEG for the vision model
+      const img = new Image();
+      img.src = p.url;
+      await img.decode();
+      const s = 1024 / Math.max(p.width, p.height);
+      const c = document.createElement("canvas");
+      c.width = Math.round(p.width * s);
+      c.height = Math.round(p.height * s);
+      c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
+      const jpg: Blob = await new Promise((r) => c.toBlob((b) => r(b!), "image/jpeg", 0.85));
+      const form = new FormData();
+      form.append("photo", new File([jpg], "photo.jpg", { type: "image/jpeg" }));
+      form.append("surface", surface);
+      const res = await fetch("/api/detect-zone", { method: "POST", body: form });
+      if (!res.ok) throw new Error((await res.text()) || "La détection a échoué.");
+      const { polygons } = (await res.json()) as { polygons: [number, number][][] };
+      setDetectedFor(surface);
+      if (!polygons.length) {
+        setDetectMsg("Aucune zone trouvée : délimitez-la à la main avec le polygone ou le pinceau.");
+        return;
+      }
+      editor.current?.fillPolygons(polygons);
+      setDetectMsg("Zone détectée. Ajustez avec la gomme ou le pinceau si besoin.");
+    } catch (e) {
+      setDetectMsg(e instanceof Error ? e.message : "La détection a échoué.");
+    } finally {
+      setDetecting(false);
+    }
+  };
+
   const onFile = async (f?: File | null) => {
     if (!f || !f.type.startsWith("image/")) return;
     setResult(null);
     setError(null);
-    setPhoto(await preparePhoto(f));
+    setDetectedFor(null);
+    const p = await preparePhoto(f);
+    setPhoto(p);
+    setTimeout(() => detect(p), 50);
   };
 
   const generate = async () => {
@@ -184,6 +226,17 @@ function Simulateur() {
 
           {photo && (
             <Step n={2} title="Délimitez la zone à recouvrir">
+              <div className="flex flex-wrap items-center gap-3 rounded-xl bg-accent/40 p-3">
+                <Button size="sm" className="rounded-full" disabled={detecting} onClick={() => detect()}>
+                  <Sparkles className="mr-1 h-4 w-4" />
+                  {detecting ? "Détection en cours…" : detectedFor && detectedFor !== surface ? "Relancer la détection" : "Détection automatique"}
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  {detectMsg ?? (detectedFor && detectedFor !== surface
+                    ? "Type de surface changé : relancez la détection."
+                    : "L'IA repère la zone, corrigez ensuite avec la gomme ou le pinceau.")}
+                </span>
+              </div>
               <ZoneEditor ref={editor} photoUrl={photo.url} width={photo.width} height={photo.height} />
             </Step>
           )}

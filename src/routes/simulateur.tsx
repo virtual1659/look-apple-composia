@@ -185,7 +185,7 @@ function Simulateur() {
           Importez une photo de votre terrasse, piscine ou façade, délimitez la zone, choisissez la lame et la teinte : le rendu est prêt en quelques secondes.
         </p>
         <ul className="mt-6 flex flex-wrap justify-center gap-5 text-xs text-muted-foreground">
-          {["Sols et façades", `${COLORS.length} teintes`, "Rendu joint au devis"].map((t) => (
+          {["Sols, façades, clôtures", `${COLORS.length} teintes`, "Rendu joint au devis"].map((t) => (
             <li key={t} className="flex items-center gap-1.5">
               <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="h-3 w-3" /></span>
               {t}

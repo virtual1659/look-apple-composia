@@ -9,7 +9,7 @@ export type Material = {
   id: string;
   name: string;
   subtitle: string;
-  surface: "sol" | "mur";
+  surface: "sol" | "mur" | "cloture";
   description: string;
   specs: { label: string; value: string }[];
   promptDescription: string;
@@ -68,6 +68,21 @@ export const MATERIALS: Material[] = [
     promptDescription:
       "composite exterior wall cladding boards 156 mm wide installed vertically, with an embossed wood-grain texture and thin shadow joints",
   },
+  {
+    id: "are-clos",
+    name: "ARE-PROFILÉ CLÔTURE 200/22",
+    subtitle: "Clôture · lames horizontales",
+    surface: "cloture",
+    description:
+      "Profilé clôture composite pour brise-vue, palissades et écrans de intimité. Pose horizontale entre poteaux, rendu plein et décoratif.",
+    specs: [
+      { label: "Largeur", value: "200 mm" },
+      { label: "Épaisseur", value: "22 mm" },
+      { label: "Finition", value: "Bois embossé" },
+    ],
+    promptDescription:
+      "composite privacy fence panels made of horizontal slats 200 mm high with an embossed wood-grain texture, filling the frame between the existing posts",
+  },
 ];
 
 export function buildPrompt(materialId: string, colorId: string): string | null {
@@ -77,7 +92,9 @@ export function buildPrompt(materialId: string, colorId: string): string | null 
   const surfaceRule =
     m.surface === "sol"
       ? "The masked area is a floor / ground surface (terrace, pool surround or walkway): lay the boards flat on the ground following its perspective."
-      : "The masked area is a building facade wall: clad the wall surface only. Windows, doors, frames, gutters, lights and railings must stay exactly as they are and stay visible.";
+      : m.surface === "mur"
+        ? "The masked area is a building facade wall: clad the wall surface only. Windows, doors, frames, gutters, lights and railings must stay exactly as they are and stay visible."
+        : "The masked area is a fence or privacy screen: rebuild the fence panels with the new horizontal slats. Posts, pillars and gates stay exactly as they are and stay visible, and whatever can be seen through or behind the fence stays natural.";
   return [
     "Photorealistic architectural renovation preview.",
     `Replace ONLY the transparent (masked) area of the first image with ${m.promptDescription}, colour ${c.en} (approximately ${c.hex}).`,

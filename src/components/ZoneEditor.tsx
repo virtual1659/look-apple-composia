@@ -44,7 +44,24 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
       fencePts.slice(0, -1).map((a, i) => {
         const b = fencePts[i + 1]!;
         return [a, b, [b[0], b[1] - fenceH[i + 1]!], [a[0], a[1] - fenceH[i]!]];
-      });
+       });
+    const maskOf = (qs: Quad[]): Promise<Blob | null> => {
+      const d = document.createElement("canvas");
+      d.width = width;
+      d.height = height;
+      const dc = d.getContext("2d")!;
+      dc.fillStyle = "black";
+      dc.fillRect(0, 0, width, height);
+      dc.globalCompositeOperation = "destination-out";
+      dc.filter = "blur(2px)";
+      for (const q of qs) {
+        dc.beginPath();
+        q.forEach(([x, y], i) => (i ? dc.lineTo(x, y) : dc.moveTo(x, y)));
+        dc.closePath();
+        dc.fill();
+      }
+      return new Promise((res) => d.toBlob(res, "image/png"));
+    };
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [tool, setTool] = useState<Tool>("polygon");
     const [brush, setBrush] = useState(60);

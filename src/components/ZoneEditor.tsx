@@ -8,6 +8,7 @@ export type ZoneEditorHandle = {
   fillPolygons: (polys: [number, number][][]) => void;
   getFenceSegments: () => Quad[];
   quadMask: (q: Quad) => Promise<Blob | null>;
+  fenceMask: () => Promise<Blob | null>;
 };
 export type Quad = [number, number][];
 
@@ -204,21 +205,8 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
       },
       getFenceSegments: () =>
         quads().sort((a, b) => a[0]![1] + a[1]![1] - (b[0]![1] + b[1]![1])),
-      quadMask: (q) => {
-        const d = document.createElement("canvas");
-        d.width = width;
-        d.height = height;
-        const dc = d.getContext("2d")!;
-        dc.fillStyle = "black";
-        dc.fillRect(0, 0, width, height);
-        dc.globalCompositeOperation = "destination-out";
-        dc.filter = "blur(2px)";
-        dc.beginPath();
-        q.forEach(([x, y], i) => (i ? dc.lineTo(x, y) : dc.moveTo(x, y)));
-        dc.closePath();
-        dc.fill();
-        return new Promise((res) => d.toBlob(res, "image/png"));
-      },
+      quadMask: (q) => maskOf([q]),
+      fenceMask: () => maskOf(quads()),
       hasSelection: () => {
         if (fence) return fencePts.length >= 2;
         const d = ctx().getImageData(0, 0, width, height).data;

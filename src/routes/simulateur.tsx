@@ -164,26 +164,19 @@ function Simulateur() {
     try {
       const swatch = await (await fetch(color.swatch)).blob();
       if (surface === "cloture") {
-        const segs = editor.current.getFenceSegments();
-        let base: Blob = photo.blob;
-        for (let i = 0; i < segs.length; i++) {
-          setProgress(`Panneau ${i + 1} sur ${segs.length}`);
-          const m = await editor.current.quadMask(segs[i]!);
-          const f = new FormData();
-          f.append("photo", new File([base], "photo.png", { type: "image/png" }));
-          f.append("mask", new File([m!], "mask.png", { type: "image/png" }));
-          f.append("swatch", new File([swatch], "swatch.jpg", { type: swatch.type || "image/jpeg" }));
-          f.append("material", materialId);
-          f.append("color", colorId);
-          let last = "";
-          await streamImage("/api/simulate", f, (src, isFinal) => {
-            last = src;
-            setResult(src);
-            setFinal(isFinal && i === segs.length - 1);
-          });
-          base = await (await fetch(last)).blob();
-          base = await toPng(base, photo.width, photo.height);
-        }
+        // One single render: all traced panels combined in one mask.
+        setProgress("Construction de la clôture…");
+        const m = await editor.current.fenceMask();
+        const f = new FormData();
+        f.append("photo", new File([photo.blob], "photo.png", { type: "image/png" }));
+        f.append("mask", new File([m!], "mask.png", { type: "image/png" }));
+        f.append("swatch", new File([swatch], "swatch.jpg", { type: swatch.type || "image/jpeg" }));
+        f.append("material", materialId);
+        f.append("color", colorId);
+        await streamImage("/api/simulate", f, (src, isFinal) => {
+          setResult(src);
+          setFinal(isFinal);
+        });
         setTimeout(() => document.getElementById("resultat")?.scrollIntoView({ behavior: "smooth" }), 100);
         return;
       }

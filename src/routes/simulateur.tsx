@@ -24,6 +24,17 @@ export const Route = createFileRoute("/simulateur")({
 
 type Photo = { url: string; blob: Blob; width: number; height: number };
 
+async function toPng(b: Blob, w: number, h: number): Promise<Blob> {
+  const img = new Image();
+  img.src = URL.createObjectURL(b);
+  await img.decode();
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  c.getContext("2d")!.drawImage(img, 0, 0, w, h);
+  return new Promise((r) => c.toBlob((x) => r(x!), "image/png"));
+}
+
 async function preparePhoto(file: File): Promise<Photo> {
   const img = new Image();
   img.src = URL.createObjectURL(file);
@@ -76,6 +87,7 @@ function Simulateur() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [progress, setProgress] = useState<string | null>(null);
   const editor = useRef<ZoneEditorHandle>(null);
 
   const materials = MATERIALS.filter((m) => m.surface === surface);
@@ -136,13 +148,13 @@ function Simulateur() {
     setDetectedFor(null);
     const p = await preparePhoto(f);
     setPhoto(p);
-    setTimeout(() => detect(p), 50);
+    setDetectMsg(null);
   };
 
   const generate = async () => {
     if (!photo || !editor.current) return;
     if (!editor.current.hasSelection()) {
-      setError("Délimitez d'abord la zone à recouvrir sur la photo.");
+      setError(surface === "cloture" ? "Tracez d'abord la ligne de la clôture au sol (2 points minimum)." : "Délimitez d'abord la zone à recouvrir sur la photo.");
       return;
     }
     setError(null);
@@ -150,8 +162,32 @@ function Simulateur() {
     setResult(null);
     setFinal(false);
     try {
-      const mask = await editor.current.getMask();
       const swatch = await (await fetch(color.swatch)).blob();
+      if (surface === "cloture") {
+        const segs = editor.current.getFenceSegments();
+        let base: Blob = photo.blob;
+        for (let i = 0; i < segs.length; i++) {
+          setProgress(`Panneau ${i + 1} sur ${segs.length}`);
+          const m = await editor.current.quadMask(segs[i]!);
+          const f = new FormData();
+          f.append("photo", new File([base], "photo.png", { type: "image/png" }));
+          f.append("mask", new File([m!], "mask.png", { type: "image/png" }));
+          f.append("swatch", new File([swatch], "swatch.jpg", { type: swatch.type || "image/jpeg" }));
+          f.append("material", materialId);
+          f.append("color", colorId);
+          let last = "";
+          await streamImage("/api/simulate", f, (src, isFinal) => {
+            last = src;
+            setResult(src);
+            setFinal(isFinal && i === segs.length - 1);
+          });
+          base = await (await fetch(last)).blob();
+          if (base.type !== "image/png") base = await toPng(base, photo.width, photo.height);
+        }
+        setTimeout(() => document.getElementById("resultat")?.scrollIntoView({ behavior: "smooth" }), 100);
+        return;
+      }
+      const mask = await editor.current.getMask();
       const form = new FormData();
       form.append("photo", new File([photo.blob], "photo.png", { type: "image/png" }));
       form.append("mask", new File([mask!], "mask.png", { type: "image/png" }));
@@ -168,6 +204,7 @@ function Simulateur() {
       setResult(null);
     } finally {
       setLoading(false);
+      setProgress(null);
     }
   };
 
@@ -249,6 +286,7 @@ function Simulateur() {
 
           {photo && (
             <Step n={2} title="Délimitez la zone à recouvrir">
+              {surface !== "cloture" && (
               <div className="flex flex-wrap items-center gap-3 rounded-xl bg-accent/40 p-3">
                 <Button size="sm" className="rounded-full" disabled={detecting} onClick={() => detect()}>
                   <Sparkles className="mr-1 h-4 w-4" />
@@ -260,7 +298,8 @@ function Simulateur() {
                     : "L'IA repère la zone, corrigez ensuite avec la gomme ou le pinceau.")}
                 </span>
               </div>
-              <ZoneEditor ref={editor} photoUrl={photo.url} width={photo.width} height={photo.height} />
+              )}
+              <ZoneEditor ref={editor} photoUrl={photo.url} width={photo.width} height={photo.height} fence={surface === "cloture"} />
             </Step>
           )}
 
@@ -335,7 +374,7 @@ function Simulateur() {
             <p className="mt-2 text-sm font-semibold">{color.label}</p>
           </div>
           <Button className="w-full rounded-full" size="lg" disabled={!photo || loading} onClick={generate}>
-            {loading ? "Génération en cours…" : "Générer mon projet"}
+            {loading ? progress ?? "Génération en cours…" : "Générer mon projet"}
           </Button>
           {loading && <p className="text-xs text-muted-foreground">Cela peut prendre jusqu'à une minute.</p>}
           {error && <p className="text-sm text-destructive">{error}</p>}

@@ -182,7 +182,7 @@ function Simulateur() {
             setFinal(isFinal && i === segs.length - 1);
           });
           base = await (await fetch(last)).blob();
-          if (base.type !== "image/png") base = await toPng(base, photo.width, photo.height);
+          base = await toPng(base, photo.width, photo.height);
         }
         setTimeout(() => document.getElementById("resultat")?.scrollIntoView({ behavior: "smooth" }), 100);
         return;

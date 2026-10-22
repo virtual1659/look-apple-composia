@@ -287,8 +287,8 @@ function Simulateur() {
         <aside className="no-reveal h-fit space-y-7 rounded-2xl bg-muted p-5 lg:sticky lg:top-24">
           <div>
             <h3 className="text-xs font-medium text-muted-foreground">Type de surface</h3>
-            <div className="mt-2 grid grid-cols-2 gap-1 rounded-xl bg-card p-1">
-              {(["sol", "mur"] as const).map((s) => (
+            <div className="mt-2 grid grid-cols-3 gap-1 rounded-xl bg-card p-1">
+              {(["sol", "mur", "cloture"] as const).map((s) => (
                 <Button
                   key={s}
                   size="sm"
@@ -298,7 +298,7 @@ function Simulateur() {
                     setMaterialId(MATERIALS.find((m) => m.surface === s)!.id);
                   }}
                 >
-                  {s === "sol" ? "Sol / piscine" : "Mur de façade"}
+                  {s === "sol" ? "Sol / piscine" : s === "mur" ? "Mur de façade" : "Clôture"}
                 </Button>
               ))}
             </div>

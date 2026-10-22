@@ -203,7 +203,7 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
         setPoints([]);
       },
       getFenceSegments: () =>
-        quads().sort((a, b) => (a[0][1] + a[1][1]) - (b[0][1] + b[1][1])),
+        quads().sort((a, b) => a[0]![1] + a[1]![1] - (b[0]![1] + b[1]![1])),
       quadMask: (q) => {
         const d = document.createElement("canvas");
         d.width = width;

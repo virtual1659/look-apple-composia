@@ -143,18 +143,37 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
         return false;
       },
       getMask: () => {
+        // The on-screen selection is a semi-transparent pattern; turn every
+        // selected pixel into a fully transparent (fully editable) mask pixel.
+        const src = canvasRef.current!.getContext("2d")!.getImageData(0, 0, width, height);
         const m = document.createElement("canvas");
         m.width = width;
         m.height = height;
         const mc = m.getContext("2d")!;
-        mc.fillStyle = "black";
-        mc.fillRect(0, 0, width, height);
-        mc.globalCompositeOperation = "destination-out";
-        // Slight dilation so edges blend naturally
-        mc.filter = "blur(2px)";
-        mc.drawImage(canvasRef.current!, 0, 0);
-        mc.drawImage(canvasRef.current!, 0, 0);
-        return new Promise((res) => m.toBlob(res, "image/png"));
+        const out = mc.createImageData(width, height);
+        for (let i = 0; i < src.data.length; i += 4) {
+          out.data[i + 3] = src.data[i + 3]! > 8 ? 0 : 255; // black opaque = keep
+        }
+        mc.putImageData(out, 0, 0);
+        // Slight dilation so edges blend naturally, then re-harden
+        const d = document.createElement("canvas");
+        d.width = width;
+        d.height = height;
+        const dc = d.getContext("2d")!;
+        dc.fillStyle = "black";
+        dc.fillRect(0, 0, width, height);
+        dc.globalCompositeOperation = "destination-out";
+        const sel = document.createElement("canvas");
+        sel.width = width;
+        sel.height = height;
+        const sc = sel.getContext("2d")!;
+        sc.fillStyle = "black";
+        sc.fillRect(0, 0, width, height);
+        sc.globalCompositeOperation = "destination-out";
+        sc.drawImage(m, 0, 0);
+        dc.filter = "blur(3px)";
+        for (let k = 0; k < 3; k++) dc.drawImage(sel, 0, 0);
+        return new Promise((res) => d.toBlob(res, "image/png"));
       },
     }));
 

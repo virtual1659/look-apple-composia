@@ -93,7 +93,7 @@ export function buildPrompt(materialId: string, colorId: string): string | null 
     m.surface === "sol"
       ? "The masked area is a floor / ground surface (terrace, pool surround or walkway): lay the boards flat on the ground following its perspective."
       : m.surface === "mur"
-        ? "The masked area is a building facade wall: clad the wall surface only. Windows, doors, frames, gutters, lights and railings must stay exactly as they are and stay visible."
+        ? "The masked area is a building facade wall: fully re-clad the wall surface with the new boards, even if it already has cladding — the existing cladding must be completely replaced and visibly different. Windows, glass, doors, frames, gutters, lights and railings must stay exactly as they are and stay visible."
         : "The masked area is a fence or privacy screen: rebuild the fence panels with the new horizontal slats. Posts, pillars and gates stay exactly as they are and stay visible, and whatever can be seen through or behind the fence stays natural.";
   return [
     "Photorealistic architectural renovation preview.",

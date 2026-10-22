@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export function BeforeAfter({ before, after, blur }: { before: string; after: string; blur?: boolean }) {
-  const [pos, setPos] = useState(50);
+  const [pos, setPos] = useState(0);
   return (
     <div className="relative w-full select-none overflow-hidden rounded-xl bg-muted shadow-soft">
       <img src={before} alt="Avant" className="block w-full" />

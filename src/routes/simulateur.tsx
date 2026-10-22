@@ -24,6 +24,35 @@ export const Route = createFileRoute("/simulateur")({
 
 type Photo = { url: string; blob: Blob; width: number; height: number };
 
+async function pixels(src: string, w: number, h: number) {
+  const img = new Image();
+  img.src = src;
+  await img.decode();
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const x = c.getContext("2d")!;
+  x.drawImage(img, 0, 0, w, h);
+  return x.getImageData(0, 0, w, h).data;
+}
+
+/** True when the AI result differs visibly from the original inside the mask. */
+async function maskChanged(before: string, after: string, mask: Blob): Promise<boolean> {
+  if (!after) return false;
+  const W = 192, H = 144;
+  const murl = URL.createObjectURL(mask);
+  const [a, b, m] = await Promise.all([pixels(before, W, H), pixels(after, W, H), pixels(murl, W, H)]);
+  URL.revokeObjectURL(murl);
+  let n = 0, diff = 0;
+  for (let i = 0; i < m.length; i += 4) {
+    if (m[i + 3]! > 64) continue; // opaque = kept area
+    n++;
+    diff += Math.abs(a[i]! - b[i]!) + Math.abs(a[i + 1]! - b[i + 1]!) + Math.abs(a[i + 2]! - b[i + 2]!);
+  }
+  if (n < 20) return true;
+  return diff / n / 3 > 12;
+}
+
 async function toPng(b: Blob, w: number, h: number): Promise<Blob> {
   const img = new Image();
   img.src = URL.createObjectURL(b);
@@ -163,34 +192,33 @@ function Simulateur() {
     setFinal(false);
     try {
       const swatch = await (await fetch(color.swatch)).blob();
-      if (surface === "cloture") {
-        // One single render: all traced panels combined in one mask.
-        setProgress("Construction de la clôture…");
-        const m = await editor.current.fenceMask();
-        const f = new FormData();
-        f.append("photo", new File([photo.blob], "photo.png", { type: "image/png" }));
-        f.append("mask", new File([m!], "mask.png", { type: "image/png" }));
-        f.append("swatch", new File([swatch], "swatch.jpg", { type: swatch.type || "image/jpeg" }));
-        f.append("material", materialId);
-        f.append("color", colorId);
-        await streamImage("/api/simulate", f, (src, isFinal) => {
-          setResult(src);
-          setFinal(isFinal);
-        });
-        setTimeout(() => document.getElementById("resultat")?.scrollIntoView({ behavior: "smooth" }), 100);
-        return;
-      }
-      const mask = await editor.current.getMask();
+      // Fence: all traced panels combined in one mask, one single render.
+      if (surface === "cloture") setProgress("Construction de la clôture…");
+      const mask = surface === "cloture" ? await editor.current.fenceMask() : await editor.current.getMask();
       const form = new FormData();
       form.append("photo", new File([photo.blob], "photo.png", { type: "image/png" }));
       form.append("mask", new File([mask!], "mask.png", { type: "image/png" }));
       form.append("swatch", new File([swatch], "swatch.jpg", { type: swatch.type || "image/jpeg" }));
       form.append("material", materialId);
       form.append("color", colorId);
-      await streamImage("/api/simulate", form, (src, isFinal) => {
-        setResult(src);
-        setFinal(isFinal);
-      });
+      // The AI occasionally returns the photo untouched: check the masked
+      // area really changed, and re-run once automatically if it did not.
+      for (let attempt = 0; attempt < 2; attempt++) {
+        let last = "";
+        await streamImage("/api/simulate", form, (src, isFinal) => {
+          last = src;
+          setResult(src);
+          setFinal(false);
+          if (isFinal) setProgress(null);
+        });
+        if (await maskChanged(photo.url, last, mask!)) break;
+        if (attempt === 0) {
+          setProgress("L'IA n'a pas modifié la zone, nouvel essai…");
+          continue;
+        }
+        setError("L'IA n'a pas réussi à modifier la zone cette fois-ci. Relancez la génération, ou agrandissez un peu la zone.");
+      }
+      setFinal(true);
       setTimeout(() => document.getElementById("resultat")?.scrollIntoView({ behavior: "smooth" }), 100);
     } catch (e) {
       setError(e instanceof Error ? e.message : "La génération a échoué.");

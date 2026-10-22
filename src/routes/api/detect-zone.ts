@@ -3,6 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 const PROMPTS = {
   sol: "Identify the main floor covering in this photo (deck boards, tiles, paving, concrete…) that will be replaced by composite decking. First determine which single continuous material covers most of the terrace/floor, then select ONLY the area covered by that same material, following its exact boundaries where the material changes. Exclude anything made of a different material even if adjacent: pool coping/edge stones, stone or tile borders, curbs, steps of another material, drains, water, grass, planters, furniture, walls, sky and vegetation.",
   mur: "Identify the main exterior facade covering in this photo (render, brick, stone, siding…) that will be replaced by composite cladding. First determine which single continuous material covers most of the wall, then select ONLY the area covered by that same material, following its exact boundaries where the material changes. Exclude windows, doors, frames, sills, trims and bands of another material, roof, gutters, ground, sky and vegetation.",
+  cloture:
+    "Identify the main fence, privacy screen or brise-vue in this photo (slatted panels, wooden or composite boards, mesh…) that will be replaced by composite fence panels. First determine which single continuous fence construction covers most of the fence, then select ONLY the panels made of that same material, following its exact boundaries. Exclude posts, pillars, walls, gates of another material, vegetation, sky and ground.",
 } as const;
 
 const schema = {

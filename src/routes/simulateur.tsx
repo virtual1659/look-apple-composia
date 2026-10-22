@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { ZoneEditor, type ZoneEditorHandle } from "@/components/ZoneEditor";
 import { BeforeAfter } from "@/components/BeforeAfter";
 import { COLORS, MATERIALS } from "@/lib/materials";
+import exemplePhoto from "@/assets/exemple-projet.jpg.asset.json";
 import { streamImage } from "@/lib/stream-image";
 
 export const Route = createFileRoute("/simulateur")({
   head: () => ({
     meta: [
       { title: "Simulateur IA avant/après · Composia" },
-      { name: "description", content: "Importez la photo de votre maison et visualisez votre terrasse ou façade en composite grâce à l'IA." },
+      { name: "description", content: "Importez la photo de votre maison et visualisez votre terrasse, votre clôture ou votre façade en composite grâce à l'IA." },
       { property: "og:title", content: "Simulateur IA avant/après · Composia" },
       { property: "og:description", content: "Visualisez votre projet composite sur votre propre photo en quelques secondes." },
       { property: "og:type", content: "website" },
@@ -67,7 +68,7 @@ const faq = [
 
 function Simulateur() {
   const [photo, setPhoto] = useState<Photo | null>(null);
-  const [surface, setSurface] = useState<"sol" | "mur">("sol");
+  const [surface, setSurface] = useState<"sol" | "mur" | "cloture">("sol");
   const [materialId, setMaterialId] = useState(MATERIALS[0]!.id);
   const [colorId, setColorId] = useState(COLORS[2]!.id);
   const [result, setResult] = useState<string | null>(null);
@@ -82,7 +83,7 @@ function Simulateur() {
 
   const [detecting, setDetecting] = useState(false);
   const [detectMsg, setDetectMsg] = useState<string | null>(null);
-  const [detectedFor, setDetectedFor] = useState<"sol" | "mur" | null>(null);
+  const [detectedFor, setDetectedFor] = useState<"sol" | "mur" | "cloture" | null>(null);
 
   const detect = async (p = photo) => {
     if (!p) return;
@@ -116,6 +117,15 @@ function Simulateur() {
       setDetectMsg(e instanceof Error ? e.message : "La détection a échoué.");
     } finally {
       setDetecting(false);
+    }
+  };
+
+  const useExample = async () => {
+    try {
+      const blob = await (await fetch(exemplePhoto.url)).blob();
+      await onFile(new File([blob], "exemple.jpg", { type: blob.type || "image/jpeg" }));
+    } catch {
+      setError("Impossible de charger la photo d'exemple.");
     }
   };
 
@@ -175,7 +185,7 @@ function Simulateur() {
           Importez une photo de votre terrasse, piscine ou façade, délimitez la zone, choisissez la lame et la teinte : le rendu est prêt en quelques secondes.
         </p>
         <ul className="mt-6 flex flex-wrap justify-center gap-5 text-xs text-muted-foreground">
-          {["Sols et façades", `${COLORS.length} teintes`, "Rendu joint au devis"].map((t) => (
+          {["Sols, façades, clôtures", `${COLORS.length} teintes`, "Rendu joint au devis"].map((t) => (
             <li key={t} className="flex items-center gap-1.5">
               <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="h-3 w-3" /></span>
               {t}
@@ -196,23 +206,36 @@ function Simulateur() {
         <div className="space-y-12">
           <Step n={1} title="Importez votre photo">
             {!photo ? (
-              <label
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setDragOver(false);
-                  onFile(e.dataTransfer.files[0]);
-                }}
-                className={`flex aspect-[16/10] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed text-center transition-colors ${dragOver ? "border-primary bg-accent/40" : "border-border bg-card hover:bg-muted"}`}
-              >
-                <Camera className="h-8 w-8 text-primary" /><span className="text-xl font-semibold">Déposez votre photo ici</span>
-                <span className="text-sm text-muted-foreground">ou touchez pour choisir / prendre une photo · JPG, PNG</span>
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-              </label>
+              <div className="space-y-3">
+                <label
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    onFile(e.dataTransfer.files[0]);
+                  }}
+                  className={`flex aspect-[16/10] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed text-center transition-colors ${dragOver ? "border-primary bg-accent/40" : "border-border bg-card hover:bg-muted"}`}
+                >
+                  <Camera className="h-8 w-8 text-primary" /><span className="text-xl font-semibold">Déposez votre photo ici</span>
+                  <span className="text-sm text-muted-foreground">ou touchez pour choisir / prendre une photo · JPG, PNG</span>
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
+                </label>
+                <button
+                  type="button"
+                  onClick={useExample}
+                  className="flex w-full items-center gap-4 rounded-2xl border bg-card p-3 text-left transition-colors hover:bg-accent/40"
+                >
+                  <img src={exemplePhoto.url} alt="Photo d'exemple : terrasse de piscine, façade et clôture" className="h-16 w-24 shrink-0 rounded-lg object-cover" />
+                  <span>
+                    <span className="block font-semibold">Essayer avec la photo d'exemple</span>
+                    <span className="block text-sm text-muted-foreground">Une piscine, une façade et une clôture : les trois surfaces en une seule photo.</span>
+                  </span>
+                </button>
+              </div>
             ) : (
               <div className="flex items-center justify-between rounded-xl bg-muted p-3 text-sm">
                 <span className="text-muted-foreground">Photo chargée ({photo.width}×{photo.height})</span>
@@ -264,8 +287,8 @@ function Simulateur() {
         <aside className="no-reveal h-fit space-y-7 rounded-2xl bg-muted p-5 lg:sticky lg:top-24">
           <div>
             <h3 className="text-xs font-medium text-muted-foreground">Type de surface</h3>
-            <div className="mt-2 grid grid-cols-2 gap-1 rounded-xl bg-card p-1">
-              {(["sol", "mur"] as const).map((s) => (
+            <div className="mt-2 grid grid-cols-3 gap-1 rounded-xl bg-card p-1">
+              {(["sol", "mur", "cloture"] as const).map((s) => (
                 <Button
                   key={s}
                   size="sm"
@@ -275,7 +298,7 @@ function Simulateur() {
                     setMaterialId(MATERIALS.find((m) => m.surface === s)!.id);
                   }}
                 >
-                  {s === "sol" ? "Sol / piscine" : "Mur de façade"}
+                  {s === "sol" ? "Sol / piscine" : s === "mur" ? "Mur de façade" : "Clôture"}
                 </Button>
               ))}
             </div>

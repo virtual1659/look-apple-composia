@@ -120,6 +120,15 @@ function Simulateur() {
     }
   };
 
+  const useExample = async () => {
+    try {
+      const blob = await (await fetch(exemplePhoto.url)).blob();
+      await onFile(new File([blob], "exemple.jpg", { type: blob.type || "image/jpeg" }));
+    } catch {
+      setError("Impossible de charger la photo d'exemple.");
+    }
+  };
+
   const onFile = async (f?: File | null) => {
     if (!f || !f.type.startsWith("image/")) return;
     setResult(null);
@@ -197,23 +206,36 @@ function Simulateur() {
         <div className="space-y-12">
           <Step n={1} title="Importez votre photo">
             {!photo ? (
-              <label
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setDragOver(false);
-                  onFile(e.dataTransfer.files[0]);
-                }}
-                className={`flex aspect-[16/10] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed text-center transition-colors ${dragOver ? "border-primary bg-accent/40" : "border-border bg-card hover:bg-muted"}`}
-              >
-                <Camera className="h-8 w-8 text-primary" /><span className="text-xl font-semibold">Déposez votre photo ici</span>
-                <span className="text-sm text-muted-foreground">ou touchez pour choisir / prendre une photo · JPG, PNG</span>
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-              </label>
+              <div className="space-y-3">
+                <label
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    onFile(e.dataTransfer.files[0]);
+                  }}
+                  className={`flex aspect-[16/10] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed text-center transition-colors ${dragOver ? "border-primary bg-accent/40" : "border-border bg-card hover:bg-muted"}`}
+                >
+                  <Camera className="h-8 w-8 text-primary" /><span className="text-xl font-semibold">Déposez votre photo ici</span>
+                  <span className="text-sm text-muted-foreground">ou touchez pour choisir / prendre une photo · JPG, PNG</span>
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
+                </label>
+                <button
+                  type="button"
+                  onClick={useExample}
+                  className="flex w-full items-center gap-4 rounded-2xl border bg-card p-3 text-left transition-colors hover:bg-accent/40"
+                >
+                  <img src={exemplePhoto.url} alt="Photo d'exemple : terrasse de piscine, façade et clôture" className="h-16 w-24 shrink-0 rounded-lg object-cover" />
+                  <span>
+                    <span className="block font-semibold">Essayer avec la photo d'exemple</span>
+                    <span className="block text-sm text-muted-foreground">Une piscine, une façade et une clôture : les trois surfaces en une seule photo.</span>
+                  </span>
+                </button>
+              </div>
             ) : (
               <div className="flex items-center justify-between rounded-xl bg-muted p-3 text-sm">
                 <span className="text-muted-foreground">Photo chargée ({photo.width}×{photo.height})</span>

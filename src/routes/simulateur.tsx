@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { ZoneEditor, type ZoneEditorHandle } from "@/components/ZoneEditor";
 import { BeforeAfter } from "@/components/BeforeAfter";
 import { COLORS, MATERIALS } from "@/lib/materials";
+import exemplePhoto from "@/assets/exemple-projet.jpg.asset.json";
 import { streamImage } from "@/lib/stream-image";
 
 export const Route = createFileRoute("/simulateur")({
   head: () => ({
     meta: [
       { title: "Simulateur IA avant/après · Composia" },
-      { name: "description", content: "Importez la photo de votre maison et visualisez votre terrasse ou façade en composite grâce à l'IA." },
+      { name: "description", content: "Importez la photo de votre maison et visualisez votre terrasse, votre clôture ou votre façade en composite grâce à l'IA." },
       { property: "og:title", content: "Simulateur IA avant/après · Composia" },
       { property: "og:description", content: "Visualisez votre projet composite sur votre propre photo en quelques secondes." },
       { property: "og:type", content: "website" },
@@ -67,7 +68,7 @@ const faq = [
 
 function Simulateur() {
   const [photo, setPhoto] = useState<Photo | null>(null);
-  const [surface, setSurface] = useState<"sol" | "mur">("sol");
+  const [surface, setSurface] = useState<"sol" | "mur" | "cloture">("sol");
   const [materialId, setMaterialId] = useState(MATERIALS[0]!.id);
   const [colorId, setColorId] = useState(COLORS[2]!.id);
   const [result, setResult] = useState<string | null>(null);
@@ -82,7 +83,7 @@ function Simulateur() {
 
   const [detecting, setDetecting] = useState(false);
   const [detectMsg, setDetectMsg] = useState<string | null>(null);
-  const [detectedFor, setDetectedFor] = useState<"sol" | "mur" | null>(null);
+  const [detectedFor, setDetectedFor] = useState<"sol" | "mur" | "cloture" | null>(null);
 
   const detect = async (p = photo) => {
     if (!p) return;

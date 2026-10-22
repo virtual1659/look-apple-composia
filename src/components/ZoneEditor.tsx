@@ -6,7 +6,10 @@ export type ZoneEditorHandle = {
   getMask: () => Promise<Blob | null>;
   hasSelection: () => boolean;
   fillPolygons: (polys: [number, number][][]) => void;
+  getFenceSegments: () => Quad[];
+  quadMask: (q: Quad) => Promise<Blob | null>;
 };
+export type Quad = [number, number][];
 
 function makePattern(ctx: CanvasRenderingContext2D) {
   const p = document.createElement("canvas");
@@ -23,8 +26,24 @@ function makePattern(ctx: CanvasRenderingContext2D) {
   return ctx.createPattern(p, "repeat")!;
 }
 
-export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width: number; height: number }>(
-  function ZoneEditor({ photoUrl, width, height }, ref) {
+export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width: number; height: number; fence?: boolean }>(
+  function ZoneEditor({ photoUrl, width, height, fence = false }, ref) {
+    const [fencePts, setFencePts] = useState<[number, number][]>([]);
+    const [fenceH, setFenceH] = useState<number[]>([]);
+    const [fenceDone, setFenceDone] = useState(false);
+    const [heightPct, setHeightPct] = useState(18);
+    const fenceHist = useRef<{ p: [number, number][]; h: number[]; d: boolean }[]>([]);
+    const drag = useRef<{ i: number; kind: "foot" | "top" } | null>(null);
+    const autoH = (y: number, pct = heightPct) => (pct / 100) * height * (0.35 + 0.9 * (y / height));
+    const pushFence = () => {
+      fenceHist.current.push({ p: fencePts, h: fenceH, d: fenceDone });
+      if (fenceHist.current.length > 40) fenceHist.current.shift();
+    };
+    const quads = (): Quad[] =>
+      fencePts.slice(0, -1).map((a, i) => {
+        const b = fencePts[i + 1]!;
+        return [a, b, [b[0], b[1] - fenceH[i + 1]!], [a[0], a[1] - fenceH[i]!]];
+      });
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [tool, setTool] = useState<Tool>("polygon");
     const [brush, setBrush] = useState(60);
@@ -40,6 +59,10 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
       history.current = [];
       setPoints([]);
       ctx().clearRect(0, 0, width, height);
+      setFencePts([]);
+      setFenceH([]);
+      setFenceDone(false);
+      fenceHist.current = [];
     }, [photoUrl, width, height]);
 
     const snapshot = () => {
@@ -82,6 +105,24 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
     const onDown = (e: React.PointerEvent) => {
       e.preventDefault();
       const p = toCanvas(e);
+      if (fence) {
+        const r = width * 0.02;
+        for (let i = 0; i < fencePts.length; i++) {
+          const [x, y] = fencePts[i]!;
+          const kind = Math.hypot(x - p[0], y - fenceH[i]! - p[1]) < r ? "top" : Math.hypot(x - p[0], y - p[1]) < r ? "foot" : null;
+          if (kind) {
+            pushFence();
+            (e.target as Element).setPointerCapture(e.pointerId);
+            drag.current = { i, kind };
+            return;
+          }
+        }
+        if (fenceDone) return;
+        pushFence();
+        setFencePts([...fencePts, p]);
+        setFenceH([...fenceH, autoH(p[1])]);
+        return;
+      }
       if (tool === "polygon") {
         if (points.length >= 3) {
           const [fx, fy] = points[0]!;
@@ -97,23 +138,47 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
       stroke(p, p);
     };
     const onMove = (e: React.PointerEvent) => {
+      if (drag.current) {
+        const p = toCanvas(e);
+        const { i, kind } = drag.current;
+        if (kind === "foot") setFencePts(fencePts.map((q, k) => (k === i ? p : q)));
+        else setFenceH(fenceH.map((h, k) => (k === i ? Math.max(10, fencePts[i]![1] - p[1]) : h)));
+        return;
+      }
       if (!drawing.current || !last.current) return;
       const p = toCanvas(e);
       stroke(last.current, p);
       last.current = p;
     };
     const onUp = () => {
+      drag.current = null;
       drawing.current = false;
       last.current = null;
     };
 
     const undo = () => {
+      if (fence) {
+        const prev = fenceHist.current.pop();
+        if (prev) {
+          setFencePts(prev.p);
+          setFenceH(prev.h);
+          setFenceDone(prev.d);
+        }
+        return;
+      }
       if (points.length) return setPoints(points.slice(0, -1));
       const prev = history.current.pop();
       if (prev) ctx().putImageData(prev, 0, 0);
       force((n) => n + 1);
     };
     const clear = () => {
+      if (fence) {
+        pushFence();
+        setFencePts([]);
+        setFenceH([]);
+        setFenceDone(false);
+        return;
+      }
       snapshot();
       ctx().clearRect(0, 0, width, height);
       setPoints([]);
@@ -137,7 +202,25 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
         }
         setPoints([]);
       },
+      getFenceSegments: () =>
+        quads().sort((a, b) => (a[0][1] + a[1][1]) - (b[0][1] + b[1][1])),
+      quadMask: (q) => {
+        const d = document.createElement("canvas");
+        d.width = width;
+        d.height = height;
+        const dc = d.getContext("2d")!;
+        dc.fillStyle = "black";
+        dc.fillRect(0, 0, width, height);
+        dc.globalCompositeOperation = "destination-out";
+        dc.filter = "blur(2px)";
+        dc.beginPath();
+        q.forEach(([x, y], i) => (i ? dc.lineTo(x, y) : dc.moveTo(x, y)));
+        dc.closePath();
+        dc.fill();
+        return new Promise((res) => d.toBlob(res, "image/png"));
+      },
       hasSelection: () => {
+        if (fence) return fencePts.length >= 2;
         const d = ctx().getImageData(0, 0, width, height).data;
         for (let i = 3; i < d.length; i += 64) if ((d[i] ?? 0) > 0) return true;
         return false;
@@ -185,6 +268,33 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
 
     return (
       <div className="space-y-3">
+        {fence ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            Hauteur
+            <input
+              type="range"
+              min={5}
+              max={45}
+              value={heightPct}
+              onChange={(e) => {
+                const v = +e.target.value;
+                setHeightPct(v);
+                setFenceH(fencePts.map((p) => autoH(p[1], v)));
+              }}
+            />
+          </label>
+          <div className="ml-auto flex gap-2">
+            {!fenceDone && fencePts.length >= 2 && (
+              <Button size="sm" onClick={() => { pushFence(); setFenceDone(true); }}>
+                Terminer le tracé
+              </Button>
+            )}
+            <Button size="sm" variant="ghost" onClick={undo}>Annuler</Button>
+            <Button size="sm" variant="ghost" onClick={clear}>Tout effacer</Button>
+          </div>
+        </div>
+        ) : (
         <div className="flex flex-wrap items-center gap-2">
           {tools.map((t) => (
             <Button key={t.id} size="sm" variant={tool === t.id ? "default" : "outline"} onClick={() => setTool(t.id)}>
@@ -211,8 +321,13 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
             </Button>
           </div>
         </div>
+        )}
         <p className="text-sm text-muted-foreground">
-          {tool === "polygon"
+          {fence
+            ? fenceDone
+              ? "Déplacez un point au sol ou une poignée de hauteur pour ajuster chaque angle."
+              : "Cliquez au pied de la clôture, point par point à chaque angle, puis « Terminer le tracé » (ou double-clic)."
+            : tool === "polygon"
             ? "Cliquez autour de la zone point par point, puis cliquez sur le premier point (ou « Fermer la zone »)."
             : tool === "brush"
               ? "Peignez la zone à recouvrir."
@@ -229,8 +344,21 @@ export const ZoneEditor = forwardRef<ZoneEditorHandle, { photoUrl: string; width
             onPointerMove={onMove}
             onPointerUp={onUp}
             onPointerLeave={onUp}
+            onDoubleClick={() => fence && fencePts.length >= 2 && setFenceDone(true)}
           />
           <svg viewBox={`0 0 ${width} ${height}`} className="pointer-events-none absolute inset-0 h-full w-full">
+            {fence && quads().map((q, i) => (
+              <polygon key={"q" + i} points={q.map((p) => p.join(",")).join(" ")} fill="var(--selection)" fillOpacity={0.4} stroke="var(--selection)" strokeWidth={width / 400} />
+            ))}
+            {fence && fencePts.length > 1 && (
+              <polyline points={fencePts.map((p) => p.join(",")).join(" ")} fill="none" stroke="white" strokeWidth={width / 350} strokeDasharray={`${width / 120} ${width / 200}`} />
+            )}
+            {fence && fencePts.map(([x, y], i) => (
+              <g key={"f" + i}>
+                <circle cx={x} cy={y} r={width / 110} fill="var(--selection)" stroke="white" strokeWidth={width / 500} />
+                <circle cx={x} cy={y - fenceH[i]!} r={width / 160} fill="white" stroke="var(--selection)" strokeWidth={width / 400} />
+              </g>
+            ))}
             {points.length > 0 && (
               <polyline
                 points={points.map((p) => p.join(",")).join(" ")}
